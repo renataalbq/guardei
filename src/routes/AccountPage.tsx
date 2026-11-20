@@ -92,7 +92,7 @@ function SignedInAccount({ service, email }: { service: AccountService; email: s
       <p className="text-sm text-fg">
         Conectado como <strong>{email}</strong>. Para usar em outro celular, entre com esse e-mail.
       </p>
-      {error && <p className="text-sm font-medium text-red-700">{error}</p>}
+      {error && <p className="text-sm font-medium text-danger">{error}</p>}
       <button
         type="button"
         onClick={() => setConfirmingSignOut(true)}

@@ -33,12 +33,24 @@ beforeEach(() => {
 describe('challengeRepository', () => {
   it('cria o desafio com as células na ordem', async () => {
     const challenge = await repository.createChallenge(draft);
-    expect(challenge).toMatchObject({ name: '20 mil em 2027', goal: 20_000, theme: 'caderno', monthlyLimit: 1_500 });
+    expect(challenge).toMatchObject({ name: '20 mil em 2027', goal: 20_000, theme: 'marca-texto', monthlyLimit: 1_500 });
 
     const cells = await repository.listCells(challenge.id);
     expect(cells).toHaveLength(199);
     expect(cells.map((cell) => cell.position)).toEqual([...Array(199).keys()]);
     expect(cells.reduce((sum, cell) => sum + cell.value, 0)).toBe(20_000);
+  });
+
+  it('troca o tema e marca para sincronizar', async () => {
+    const challenge = await repository.createChallenge(draft, 'caderno');
+    await database.challenges.update(challenge.id, { pendingSync: 0 });
+    clock = new Date('2027-02-01T00:00:00.000Z');
+    await repository.changeTheme(challenge.id, 'escuro');
+    expect(await database.challenges.get(challenge.id)).toMatchObject({
+      theme: 'escuro',
+      updatedAt: '2027-02-01T00:00:00.000Z',
+      pendingSync: 1,
+    });
   });
 
   it('salva a meta arredondada pelo step', async () => {

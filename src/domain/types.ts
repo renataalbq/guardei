@@ -1,6 +1,6 @@
 export type ChallengeType = 'sequential' | 'weeks52';
 
-export type ThemeId = 'caderno' | 'marca-texto' | 'escuro';
+export type ThemeId = 'marca-texto' | 'caderno' | 'escuro';
 
 export const SEQUENTIAL_STEPS = [1, 2, 5, 10] as const;
 export type SequentialStep = (typeof SEQUENTIAL_STEPS)[number];

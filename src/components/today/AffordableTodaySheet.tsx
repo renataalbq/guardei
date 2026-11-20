@@ -46,7 +46,7 @@ export function AffordableTodaySheet({ open, onClose, todayBudget, smallestOpenV
         {amount === undefined ? (
           <span className="text-muted">Digite um valor para ver o que cabe.</span>
         ) : fittingCount > 0 ? (
-          <span className="text-emerald-700">
+          <span className="text-money-fg">
             {fittingCount === 1 ? '1 valor cabe' : `${fittingCount} valores cabem`} em {formatCurrency(amount)}.
           </span>
         ) : (

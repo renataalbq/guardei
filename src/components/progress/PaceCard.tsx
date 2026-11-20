@@ -74,7 +74,7 @@ export function PaceCard({ challenge, savedAmount, today }: PaceCardProps) {
       {projection && (
         <p
           className={`mt-3 rounded-xl px-3 py-2 text-sm font-semibold ${
-            pace.onTrack === false ? 'bg-warning-bg text-warning-fg' : 'bg-money-soft text-emerald-800'
+            pace.onTrack === false ? 'bg-warning-bg text-warning-fg' : 'bg-money-soft text-money-fg'
           }`}
         >
           {pace.onTrack === false

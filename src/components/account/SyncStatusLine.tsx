@@ -26,7 +26,7 @@ export function SyncStatusLine({ status }: { status: SyncStatus }) {
   const icon = status.state === 'offline' || status.state === 'disabled' ? 'cloudOff' : 'cloud';
   return (
     <div className="card flex items-start gap-2 px-4 py-3 text-sm text-fg">
-      <Icon name={icon} className={`mt-0.5 shrink-0 text-lg ${status.state === 'error' ? 'text-red-700' : 'text-ink'}`} />
+      <Icon name={icon} className={`mt-0.5 shrink-0 text-lg ${status.state === 'error' ? 'text-danger' : 'text-ink'}`} />
       <div className="flex-1">
         <p>{describeSyncStatus(status)}</p>
         {status.state === 'error' && (
