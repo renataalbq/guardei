@@ -32,6 +32,9 @@ export function computeProgress(goal: number, cells: readonly Pick<Cell, 'value'
   };
 }
 
+/** Com poucos dias de histórico a projeção pelo ritmo engana; só projeta a partir daqui. */
+export const MIN_DAYS_FOR_PROJECTION = 7;
+
 export interface PaceInput {
   goal: number;
   savedAmount: number;
@@ -51,7 +54,7 @@ export type DeadlinePace =
       daysLeft?: number;
       /** Quanto guardar por dia (arredondado para cima) para chegar ao prazo. */
       dailyAmountNeeded?: number;
-      /** Data estimada de conclusão mantendo o ritmo atual; ausente se nada foi guardado ainda. */
+      /** Data estimada de conclusão mantendo o ritmo atual; ausente se nada foi guardado ou se o desafio tem menos de 7 dias. */
       projectedFinishDate?: CalendarDate;
       /** Se o ritmo atual chega até o prazo. */
       onTrack?: boolean;
@@ -71,8 +74,8 @@ export function computeDeadlinePace({ goal, savedAmount, startDate, endDate, tod
   const dailyAmountNeeded = daysLeft ? Math.ceil(remainingAmount / daysLeft) : undefined;
 
   let projectedFinishDate: CalendarDate | undefined;
-  if (savedAmount > 0) {
-    const daysElapsed = Math.max(1, daysInPeriodInclusive(startDate, today));
+  const daysElapsed = daysInPeriodInclusive(startDate, today);
+  if (savedAmount > 0 && daysElapsed >= MIN_DAYS_FOR_PROJECTION) {
     const amountPerDay = savedAmount / daysElapsed;
     projectedFinishDate = addDays(today, Math.ceil(remainingAmount / amountPerDay));
   }

@@ -30,6 +30,7 @@ export function CreateChallengePage() {
   const [monthlyLimit, setMonthlyLimit] = useState<number | undefined>();
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [saveError, setSaveError] = useState<string | undefined>();
 
   const draft: ChallengeDraft = { name, goal: goal ?? 0, type, step, startDate, endDate, monthlyLimit };
   const evaluation = evaluateChallengeDraft(draft);
@@ -40,9 +41,13 @@ export function CreateChallengePage() {
     setSubmitAttempted(true);
     if (!evaluation.isValid || evaluation.nameProblem || isSaving) return;
     setIsSaving(true);
+    setSaveError(undefined);
     try {
       const challenge = await challengeRepository.createChallenge(draft);
       navigate(`/desafio/${challenge.id}`, { replace: true });
+    } catch (error) {
+      console.error('Falha ao criar desafio', error);
+      setSaveError('Não foi possível salvar o desafio neste aparelho. Tente de novo.');
     } finally {
       setIsSaving(false);
     }
@@ -133,6 +138,11 @@ export function CreateChallengePage() {
       </form>
 
       <div className="fixed inset-x-0 bottom-0 border-t border-border bg-paper/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
+        {saveError && (
+          <p role="alert" className="mx-auto mb-2 max-w-xl text-center text-sm font-medium text-red-700">
+            {saveError}
+          </p>
+        )}
         <button
           type="submit"
           form="create-challenge"
