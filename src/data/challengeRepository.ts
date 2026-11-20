@@ -1,3 +1,4 @@
+import { createId } from '../domain/createId';
 import { effectiveGoal, generateCellValues } from '../domain/generateCells';
 import type { ChallengeDraft } from '../domain/previewChallenge';
 import type { Cell, Challenge, StrokePoint, ThemeId } from '../domain/types';
@@ -19,7 +20,7 @@ export function createChallengeRepository(db: GuardeiDatabase = defaultDb, now: 
     async createChallenge(draft: ChallengeDraft, theme: ThemeId = 'caderno'): Promise<Challenge> {
       const createdAt = timestamp();
       const challenge: Challenge = {
-        id: crypto.randomUUID(),
+        id: createId(),
         name: draft.name.trim(),
         goal: effectiveGoal(draft),
         type: draft.type,
@@ -32,7 +33,7 @@ export function createChallengeRepository(db: GuardeiDatabase = defaultDb, now: 
         updatedAt: createdAt,
       };
       const cells: Cell[] = generateCellValues(draft).map((value, position) => ({
-        id: crypto.randomUUID(),
+        id: createId(),
         challengeId: challenge.id,
         value,
         position,
