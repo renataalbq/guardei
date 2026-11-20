@@ -2,24 +2,31 @@ import { createId } from '../domain/createId';
 import { effectiveGoal, generateCellValues } from '../domain/generateCells';
 import type { ChallengeDraft } from '../domain/previewChallenge';
 import type { Cell, Challenge, StrokePoint, ThemeId } from '../domain/types';
-import { db as defaultDb, type GuardeiDatabase } from './db';
+import { db as defaultDb, type CellRecord, type ChallengeRecord, type GuardeiDatabase } from './db';
+import { notifyLocalChange } from './localChanges';
 
 export interface CellMark {
   cellId: string;
   stroke: StrokePoint[];
 }
 
+const isVisible = (challenge: ChallengeRecord) => challenge.deletedAt === undefined;
+
 /**
- * Único ponto de acesso ao banco local. Quando houver sincronização na nuvem,
- * é aqui que ela entra, sem mudar os componentes.
+ * Único ponto de acesso aos dados pelo app. Toda alteração fica marcada como pendente
+ * e avisa a sincronização, que envia para a nuvem quando houver conexão.
  */
-export function createChallengeRepository(db: GuardeiDatabase = defaultDb, now: () => Date = () => new Date()) {
+export function createChallengeRepository(
+  db: GuardeiDatabase = defaultDb,
+  now: () => Date = () => new Date(),
+  onLocalChange: () => void = notifyLocalChange,
+) {
   const timestamp = () => now().toISOString();
 
   return {
     async createChallenge(draft: ChallengeDraft, theme: ThemeId = 'caderno'): Promise<Challenge> {
       const createdAt = timestamp();
-      const challenge: Challenge = {
+      const challenge: ChallengeRecord = {
         id: createId(),
         name: draft.name.trim(),
         goal: effectiveGoal(draft),
@@ -31,27 +38,32 @@ export function createChallengeRepository(db: GuardeiDatabase = defaultDb, now: 
         theme,
         createdAt,
         updatedAt: createdAt,
+        pendingSync: 1,
       };
-      const cells: Cell[] = generateCellValues(draft).map((value, position) => ({
+      const cells: CellRecord[] = generateCellValues(draft).map((value, position) => ({
         id: createId(),
         challengeId: challenge.id,
         value,
         position,
         updatedAt: createdAt,
+        pendingSync: 1,
       }));
       await db.transaction('rw', db.challenges, db.cells, async () => {
         await db.challenges.add(challenge);
         await db.cells.bulkAdd(cells);
       });
+      onLocalChange();
       return challenge;
     },
 
-    listChallenges(): Promise<Challenge[]> {
-      return db.challenges.orderBy('createdAt').reverse().toArray();
+    async listChallenges(): Promise<Challenge[]> {
+      const challenges = await db.challenges.orderBy('createdAt').reverse().toArray();
+      return challenges.filter(isVisible);
     },
 
-    getChallenge(challengeId: string): Promise<Challenge | undefined> {
-      return db.challenges.get(challengeId);
+    async getChallenge(challengeId: string): Promise<Challenge | undefined> {
+      const challenge = await db.challenges.get(challengeId);
+      return challenge && isVisible(challenge) ? challenge : undefined;
     },
 
     listCells(challengeId: string): Promise<Cell[]> {
@@ -71,9 +83,10 @@ export function createChallengeRepository(db: GuardeiDatabase = defaultDb, now: 
             .where('id')
             .equals(cellId)
             .and((cell) => cell.savedAt === undefined)
-            .modify({ savedAt, stroke, updatedAt: savedAt });
+            .modify({ savedAt, stroke, updatedAt: savedAt, pendingSync: 1 });
         }
       });
+      onLocalChange();
     },
 
     markCellAsSaved(cellId: string, stroke: StrokePoint[]): Promise<void> {
@@ -81,18 +94,22 @@ export function createChallengeRepository(db: GuardeiDatabase = defaultDb, now: 
     },
 
     async unmarkCell(cellId: string): Promise<void> {
-      await db.cells.update(cellId, { savedAt: undefined, stroke: undefined, updatedAt: timestamp() });
+      await db.cells.update(cellId, { savedAt: undefined, stroke: undefined, updatedAt: timestamp(), pendingSync: 1 });
+      onLocalChange();
     },
 
     async changeTheme(challengeId: string, theme: ThemeId): Promise<void> {
-      await db.challenges.update(challengeId, { theme, updatedAt: timestamp() });
+      await db.challenges.update(challengeId, { theme, updatedAt: timestamp(), pendingSync: 1 });
+      onLocalChange();
     },
 
     async deleteChallenge(challengeId: string): Promise<void> {
+      const deletedAt = timestamp();
       await db.transaction('rw', db.challenges, db.cells, async () => {
         await db.cells.where('challengeId').equals(challengeId).delete();
-        await db.challenges.delete(challengeId);
+        await db.challenges.update(challengeId, { deletedAt, updatedAt: deletedAt, pendingSync: 1 });
       });
+      onLocalChange();
     },
   };
 }

@@ -1,7 +1,7 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import type { ChallengeDraft } from '../domain/previewChallenge';
-import { openGuardeiDatabase } from './db';
+import { openGuardeiDatabase, type GuardeiDatabase } from './db';
 import { createChallengeRepository, type ChallengeRepository } from './challengeRepository';
 
 const draft: ChallengeDraft = {
@@ -15,11 +15,15 @@ const draft: ChallengeDraft = {
 };
 
 let repository: ChallengeRepository;
+let database: GuardeiDatabase;
 let clock: Date;
+let localChangeCount: number;
 
 beforeEach(() => {
   clock = new Date('2027-01-01T12:00:00.000Z');
-  repository = createChallengeRepository(openGuardeiDatabase(`test-${crypto.randomUUID()}`), () => clock);
+  localChangeCount = 0;
+  database = openGuardeiDatabase(`test-${crypto.randomUUID()}`);
+  repository = createChallengeRepository(database, () => clock, () => localChangeCount++);
 });
 
 describe('challengeRepository', () => {
@@ -65,6 +69,31 @@ describe('challengeRepository', () => {
     await repository.markCellAsSaved(first!.id, [{ x: 0, y: 0.1 }, { x: 1, y: 0.1 }]);
     const [after] = await repository.listCells(challenge.id);
     expect(after?.stroke?.[0]?.y).toBe(0.5);
+  });
+
+  it('marca tudo como pendente de envio e avisa a sincronização', async () => {
+    const challenge = await repository.createChallenge(draft);
+    expect((await database.challenges.get(challenge.id))?.pendingSync).toBe(1);
+    expect(await database.cells.where('pendingSync').equals(1).count()).toBe(199);
+
+    await database.cells.toCollection().modify({ pendingSync: 0 });
+    const [first] = await repository.listCells(challenge.id);
+    await repository.markCellAsSaved(first!.id, [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]);
+    await repository.unmarkCell(first!.id);
+    expect(await database.cells.where('pendingSync').equals(1).count()).toBe(1);
+    expect(localChangeCount).toBe(3);
+  });
+
+  it('apagar esconde o desafio mas guarda a exclusão para sincronizar', async () => {
+    const challenge = await repository.createChallenge(draft);
+    clock = new Date('2027-03-01T00:00:00.000Z');
+    await repository.deleteChallenge(challenge.id);
+    expect(await repository.getChallenge(challenge.id)).toBeUndefined();
+    expect(await database.challenges.get(challenge.id)).toMatchObject({
+      deletedAt: '2027-03-01T00:00:00.000Z',
+      updatedAt: '2027-03-01T00:00:00.000Z',
+      pendingSync: 1,
+    });
   });
 
   it('lista vários desafios e apaga um com suas células', async () => {
