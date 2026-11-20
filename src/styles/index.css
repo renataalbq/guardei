@@ -6,9 +6,33 @@
   --font-hand: 'Caveat', 'Comic Sans MS', cursive;
 }
 
+/* Cores vêm de variáveis CSS para os temas poderem trocá-las (etapa de temas). */
+@theme inline {
+  --color-paper: var(--paper);
+  --color-paper-line: var(--paper-line);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-ink-soft: var(--ink-soft);
+  --color-marker: var(--marker);
+  --color-fg: var(--fg);
+  --color-muted: var(--muted);
+  --color-border: var(--border);
+  --color-warning-bg: var(--warning-bg);
+  --color-warning-fg: var(--warning-fg);
+}
+
 :root {
   --paper: #fdfbf4;
+  --paper-line: #dde8f3;
+  --surface: #ffffff;
   --ink: #1f3a8a;
+  --ink-soft: #e6ecfa;
+  --marker: #1f3a8a;
+  --fg: #1f2937;
+  --muted: #6b7280;
+  --border: #d9dee7;
+  --warning-bg: #fff4d6;
+  --warning-fg: #7a4b00;
   color-scheme: light;
 }
 
@@ -21,8 +45,26 @@ body,
 body {
   margin: 0;
   background: var(--paper);
-  color: #1f2937;
+  color: var(--fg);
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
+}
+
+@utility paper-grid {
+  background-color: var(--paper);
+  background-image:
+    linear-gradient(var(--paper-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Inputs de data do iOS ficam com altura própria; normaliza com o resto do formulário. */
+input[type='date'] {
+  -webkit-appearance: none;
+  appearance: none;
+  min-height: 3rem;
+}
+input[type='date']::-webkit-date-and-time-value {
+  text-align: left;
 }
