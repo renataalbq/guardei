@@ -58,13 +58,3 @@ body {
     linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
   background-size: 24px 24px;
 }
-
-/* Inputs de data do iOS ficam com altura própria; normaliza com o resto do formulário. */
-input[type='date'] {
-  -webkit-appearance: none;
-  appearance: none;
-  min-height: 3rem;
-}
-input[type='date']::-webkit-date-and-time-value {
-  text-align: left;
-}

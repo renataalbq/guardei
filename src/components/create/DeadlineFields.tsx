@@ -1,7 +1,8 @@
 import { addDays, firstDayOfYear, lastDayOfYear, yearOf } from '../../domain/calendarDate';
 import type { CalendarDate } from '../../domain/types';
 import { ChoiceChip } from '../ui/ChoiceChip';
-import { FormField, textInputClassName } from '../ui/FormField';
+import { DateInput } from '../ui/DateInput';
+import { FormField } from '../ui/FormField';
 
 const YEARS_OFFERED_AHEAD = 4;
 
@@ -30,13 +31,7 @@ export function DeadlineFields({ today, startDate, endDate, onStartDateChange, o
             1º de janeiro de {yearOf(nextNewYear)}
           </ChoiceChip>
         </div>
-        <input
-          id="start-date"
-          type="date"
-          value={startDate}
-          onChange={(event) => onStartDateChange(event.target.value)}
-          className={textInputClassName}
-        />
+        <DateInput id="start-date" value={startDate} onChange={(date) => onStartDateChange(date ?? '')} />
       </FormField>
 
       <FormField label="Até quando? (opcional)" htmlFor="end-date" hint="Com prazo, o app calcula quanto guardar por dia.">
@@ -50,14 +45,7 @@ export function DeadlineFields({ today, startDate, endDate, onStartDateChange, o
             </ChoiceChip>
           ))}
         </div>
-        <input
-          id="end-date"
-          type="date"
-          value={endDate ?? ''}
-          min={minimumEndDate}
-          onChange={(event) => onEndDateChange(event.target.value || undefined)}
-          className={textInputClassName}
-        />
+        <DateInput id="end-date" value={endDate} min={minimumEndDate} onChange={onEndDateChange} placeholder="Escolher data" />
       </FormField>
     </>
   );
