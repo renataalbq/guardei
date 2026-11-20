@@ -9,6 +9,7 @@ import { ChallengeHero } from '../components/progress/ChallengeHero';
 import { MilestoneCelebration } from '../components/progress/MilestoneCelebration';
 import { PaceCard } from '../components/progress/PaceCard';
 import { ProgressHeader } from '../components/progress/ProgressHeader';
+import { ShareStorySheet } from '../components/share/ShareStorySheet';
 import { ThemePicker } from '../components/theme/ThemePicker';
 import { BottomSheet } from '../components/ui/BottomSheet';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
@@ -56,6 +57,7 @@ export function ChallengePage() {
   const [cellToUndo, setCellToUndo] = useState<Cell | undefined>();
   const [isTodaySheetOpen, setIsTodaySheetOpen] = useState(false);
   const [isThemeSheetOpen, setIsThemeSheetOpen] = useState(false);
+  const [isShareSheetOpen, setIsShareSheetOpen] = useState(false);
   const today = useMemo(() => todayCalendarDate(), []);
   const ready = state.status === 'ready' ? state : undefined;
   const { celebratingPercent, stopCelebrating } = useMilestoneCelebration(ready?.challenge.goal, ready?.progress.savedAmount);
@@ -108,6 +110,13 @@ export function ChallengePage() {
         className={`mx-auto flex max-w-3xl flex-col gap-4 px-4 pt-4 ${todayBudget.budget ? 'pb-28' : 'pb-[max(2.5rem,env(safe-area-inset-bottom))]'}`}
       >
         <ChallengeHero progress={progress} />
+        <button
+          type="button"
+          onClick={() => setIsShareSheetOpen(true)}
+          className="-mt-1 flex items-center justify-center gap-2 rounded-2xl bg-surface py-3 text-sm font-bold text-ink shadow-[var(--shadow-card)] active:scale-[0.98]"
+        >
+          <Icon name="share" className="text-base" /> Compartilhar no story
+        </button>
         <ActivityStrip cells={cells} today={today} />
         <PaceCard challenge={challenge} savedAmount={progress.savedAmount} today={today} />
 
@@ -168,6 +177,9 @@ export function ChallengePage() {
         <ThemePicker value={challenge.theme} onChange={(theme) => void challengeRepository.changeTheme(challenge.id, theme)} />
         <p className="mt-4 text-center text-sm text-muted">O tema vale só para este desafio e aparece também na imagem de compartilhar.</p>
       </BottomSheet>
+      {isShareSheetOpen && (
+        <ShareStorySheet challenge={challenge} cells={cells} progress={progress} onClose={() => setIsShareSheetOpen(false)} />
+      )}
       {!isTodaySheetOpen && <TodayBudgetBar todayBudget={todayBudget} onEdit={openTodaySheet} />}
 
       {celebratingPercent !== undefined && <MilestoneCelebration percent={celebratingPercent} onDone={stopCelebrating} />}
