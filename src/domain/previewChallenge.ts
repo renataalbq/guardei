@@ -28,8 +28,7 @@ export interface ChallengePreview {
 }
 
 export type ChallengeDraftEvaluation =
-  | { isValid: true; preview: ChallengePreview; nameProblem?: string }
-  | { isValid: false; problems: string[]; nameProblem?: string };
+  { isValid: true; preview: ChallengePreview; nameProblem?: string } | { isValid: false; problems: string[]; nameProblem?: string };
 
 /** Valida o rascunho do desafio e calcula a pré-visualização mostrada antes de confirmar. */
 export function evaluateChallengeDraft(draft: ChallengeDraft): ChallengeDraftEvaluation {

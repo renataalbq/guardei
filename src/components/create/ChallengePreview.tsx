@@ -10,40 +10,40 @@ interface ChallengePreviewProps {
   endDate: CalendarDate | undefined;
 }
 
+function Stat({ label, value, detail }: { label: string; value: string; detail?: string }) {
+  return (
+    <div className="rounded-2xl bg-white/12 p-3">
+      <p className="text-xs font-semibold text-white/75">{label}</p>
+      <p className="font-display text-2xl leading-tight font-extrabold font-numeric">{value}</p>
+      {detail && <p className="text-xs text-white/75">{detail}</p>}
+    </div>
+  );
+}
+
 export function ChallengePreview({ preview, type, step, endDate }: ChallengePreviewProps) {
-  const cellsLabel = type === 'weeks52' ? 'semanas' : 'números para riscar';
+  const hasDeadline = preview.dailyAverageNeeded !== undefined && endDate !== undefined;
 
   return (
-    <section aria-label="Pré-visualização do desafio" className="paper-grid rounded-2xl border border-border p-4">
-      <h2 className="font-hand text-2xl font-bold text-ink">Como vai ficar</h2>
-      <dl className="mt-2 grid grid-cols-2 gap-3">
-        <div>
-          <dt className="text-xs text-muted">Células</dt>
-          <dd>
-            <span className="block font-hand text-3xl font-bold text-fg">{preview.cellCount}</span>
-            <span className="block text-xs text-muted">{cellsLabel}</span>
-          </dd>
-        </div>
-        <div>
-          <dt className="text-xs text-muted">Maior valor</dt>
-          <dd className="font-hand text-3xl font-bold text-fg">{formatCurrency(preview.largestValue)}</dd>
-        </div>
-        <div className="col-span-2">
-          <dt className="text-xs text-muted">Por dia, em média</dt>
-          <dd className="text-sm text-fg">
-            {preview.dailyAverageNeeded !== undefined && endDate ? (
-              <>
-                <span className="mr-1 font-hand text-3xl font-bold">{formatCurrency(preview.dailyAverageNeeded)}</span> para chegar até{' '}
-                {formatCalendarDate(endDate)} ({preview.periodDays} dias)
-              </>
-            ) : (
-              'Sem prazo: você guarda no seu ritmo.'
-            )}
-          </dd>
-        </div>
-      </dl>
+    <section aria-label="Pré-visualização do desafio" className="hero-gradient rounded-[2rem] p-5 shadow-[var(--shadow-brand)]">
+      <p className="text-sm font-semibold text-white/80">Como vai ficar</p>
+      <p className="font-display text-3xl font-extrabold font-numeric">{formatCurrency(preview.effectiveGoal)}</p>
+      <div className="mt-3 grid grid-cols-2 gap-2">
+        <Stat label={type === 'weeks52' ? 'Semanas' : 'Números para riscar'} value={String(preview.cellCount)} />
+        <Stat label="Maior valor" value={formatCurrency(preview.largestValue)} />
+        {hasDeadline && preview.periodDays !== undefined && (
+          <>
+            <Stat label="Por dia" value={formatCurrency(preview.dailyAverageNeeded!)} detail={`${preview.periodDays} dias`} />
+            <Stat
+              label="Por semana"
+              value={formatCurrency(Math.ceil(preview.effectiveGoal / Math.max(1, preview.periodDays / 7)))}
+              detail={`até ${formatCalendarDate(endDate)}`}
+            />
+          </>
+        )}
+      </div>
+      {!hasDeadline && <p className="mt-3 text-sm text-white/85">Sem prazo: você guarda no seu ritmo.</p>}
       {preview.goalWasRounded && (
-        <p className="mt-3 text-sm text-warning-fg">
+        <p className="mt-3 rounded-xl bg-white/15 px-3 py-2 text-sm">
           A meta foi ajustada para {formatCurrency(preview.effectiveGoal)} para os valores ficarem de {step} em {step}.
         </p>
       )}

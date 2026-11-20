@@ -9,31 +9,26 @@ interface ProgressHeaderProps {
   progress: ChallengeProgress;
 }
 
-/** Topo fixo da tela do desafio: total guardado, % da meta e quanto falta. */
+/** Topo fixo e compacto: total guardado, % da meta e quanto falta sempre à vista enquanto rola a grade. */
 export function ProgressHeader({ name, progress }: ProgressHeaderProps) {
   return (
-    <header className="sticky top-0 z-20 border-b border-border bg-paper/95 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-3 backdrop-blur">
+    <header className="sticky top-0 z-20 border-b border-border/70 bg-paper/85 px-4 pt-[max(0.5rem,env(safe-area-inset-top))] pb-2.5 backdrop-blur-xl">
       <div className="mx-auto max-w-3xl">
-        <div className="flex items-center gap-1">
-          <Link to="/" aria-label="Voltar" className="-ml-2 shrink-0 rounded-full p-2 text-2xl text-ink active:bg-ink-soft">
+        <div className="flex items-center gap-2">
+          <Link to="/" aria-label="Voltar" className="-ml-2 shrink-0 rounded-full p-2 text-xl text-fg active:bg-ink-soft">
             <Icon name="back" />
           </Link>
-          <h1 className="truncate pr-2 font-hand text-3xl font-bold text-ink">{name}</h1>
-        </div>
-        <div className="mt-1 flex items-end justify-between gap-3" aria-live="polite">
-          <p className="text-sm text-muted">
-            <strong className="mr-1 font-hand text-3xl leading-none font-bold text-fg">{formatCurrency(progress.savedAmount)}</strong> de{' '}
-            {formatCurrency(progress.goal)}
-          </p>
-          <p className="shrink-0 text-right text-sm">
-            <strong className="text-fg">{Math.floor(progress.percent)}%</strong>
-            <span className="block text-xs text-muted">
-              {progress.remainingAmount > 0 ? `faltam ${formatCurrency(progress.remainingAmount)}` : 'meta batida!'}
-            </span>
+          <h1 className="min-w-0 flex-1 truncate font-display text-lg font-bold">{name}</h1>
+          <p className="shrink-0 text-right text-sm font-numeric" aria-live="polite">
+            <strong className="font-display text-base font-extrabold">{formatCurrency(progress.savedAmount)}</strong>
+            <span className="text-muted"> · {Math.floor(progress.percent)}%</span>
           </p>
         </div>
-        <div className="mt-2">
-          <ProgressBar percent={progress.percent} label="Progresso da meta" />
+        <div className="mt-1.5 flex items-center gap-2">
+          <ProgressBar percent={progress.percent} size="sm" label="Progresso da meta" />
+          <span className="shrink-0 text-xs font-semibold text-muted font-numeric">
+            {progress.remainingAmount > 0 ? `faltam ${formatCurrency(progress.remainingAmount)}` : 'meta batida!'}
+          </span>
         </div>
       </div>
     </header>

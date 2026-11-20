@@ -18,7 +18,7 @@ export function MonthlyLimitNotice({ plan, goal, monthlyLimit, endDate, onUseSug
 
   if (!endDate) {
     return (
-      <div className="rounded-xl border border-border bg-surface p-3 text-sm text-fg">
+      <div className="card p-4 text-sm text-fg">
         <p>
           Guardando {formatCurrency(monthlyLimit)} por mês, você chega lá em <strong>{suggestedLabel}</strong>.
         </p>
@@ -35,8 +35,8 @@ export function MonthlyLimitNotice({ plan, goal, monthlyLimit, endDate, onUseSug
 
   if (plan.fitsDeadline) {
     return (
-      <p className="flex items-start gap-2 rounded-xl bg-ink-soft p-3 text-sm text-fg">
-        <Icon name="check" className="mt-0.5 shrink-0 text-ink" />
+      <p className="flex items-start gap-2 rounded-2xl bg-money-soft p-4 text-sm font-medium text-emerald-900">
+        <Icon name="check" className="mt-0.5 shrink-0 text-money" />
         <span>
           Cabe no seu limite: são ~{formatCurrency(plan.requiredPerMonth ?? 0)} por mês até {formatCalendarDate(endDate)}.
         </span>
@@ -45,7 +45,7 @@ export function MonthlyLimitNotice({ plan, goal, monthlyLimit, endDate, onUseSug
   }
 
   return (
-    <div role="alert" className="rounded-xl bg-warning-bg p-3 text-sm text-warning-fg">
+    <div role="alert" className="rounded-2xl bg-warning-bg p-4 text-sm text-warning-fg">
       <p className="flex items-start gap-2">
         <Icon name="alert" className="mt-0.5 shrink-0" />
         <span>
@@ -58,7 +58,7 @@ export function MonthlyLimitNotice({ plan, goal, monthlyLimit, endDate, onUseSug
       <button
         type="button"
         onClick={() => onUseSuggestedEndDate(plan.estimatedEndDate)}
-        className="mt-3 w-full rounded-lg bg-warning-fg px-3 py-2.5 font-semibold text-white active:scale-[0.98]"
+        className="mt-3 w-full rounded-2xl bg-warning-fg px-3 py-3 font-bold text-white active:scale-[0.97]"
       >
         Aumentar prazo para {suggestedLabel}
       </button>

@@ -12,7 +12,12 @@ export function createSupabaseRemoteStore(client: SupabaseClient): RemoteStore {
   async function fetchChangedSince<T>(table: string, columns: string, since: string | undefined): Promise<T[]> {
     const rows: T[] = [];
     for (let from = 0; ; from += PAGE_SIZE) {
-      let query = client.from(table).select(columns).order('server_updated_at').order('id').range(from, from + PAGE_SIZE - 1);
+      let query = client
+        .from(table)
+        .select(columns)
+        .order('server_updated_at')
+        .order('id')
+        .range(from, from + PAGE_SIZE - 1);
       if (since) query = query.gt('server_updated_at', since);
       const { data, error } = await query;
       if (error) throw error;

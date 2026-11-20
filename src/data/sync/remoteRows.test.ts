@@ -22,7 +22,10 @@ const cell: CellRecord = {
   value: 37,
   position: 36,
   savedAt: '2027-01-02T09:00:00.000Z',
-  stroke: [{ x: 0, y: 0.5 }, { x: 1, y: 0.4 }],
+  stroke: [
+    { x: 0, y: 0.5 },
+    { x: 1, y: 0.4 },
+  ],
   updatedAt: '2027-01-02T09:00:00.000Z',
   pendingSync: 1,
 };
@@ -46,7 +49,11 @@ describe('mapeamento local ↔ nuvem', () => {
   });
 
   it('normaliza o formato de data do Postgres', () => {
-    const fromPostgres = challengeFromRemote({ ...challengeToRemote(challenge), updated_at: '2026-11-20T10:00:00+00:00', deleted_at: '2026-12-01T08:30:00.5+00:00' });
+    const fromPostgres = challengeFromRemote({
+      ...challengeToRemote(challenge),
+      updated_at: '2026-11-20T10:00:00+00:00',
+      deleted_at: '2026-12-01T08:30:00.5+00:00',
+    });
     expect(fromPostgres.updatedAt).toBe('2026-11-20T10:00:00.000Z');
     expect(fromPostgres.deletedAt).toBe('2026-12-01T08:30:00.500Z');
   });

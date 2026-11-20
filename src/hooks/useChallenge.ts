@@ -6,22 +6,17 @@ import { generateHandDrawnStroke } from '../domain/generateHandDrawnStroke';
 import type { Cell, Challenge } from '../domain/types';
 
 export type ChallengeState =
-  | { status: 'loading' }
-  | { status: 'not-found' }
-  | { status: 'ready'; challenge: Challenge; cells: Cell[]; progress: ChallengeProgress };
+  { status: 'loading' } | { status: 'not-found' } | { status: 'ready'; challenge: Challenge; cells: Cell[]; progress: ChallengeProgress };
 
 /** Desafio com suas células e progresso (ao vivo) e as ações de riscar/desfazer. */
 export function useChallenge(challengeId: string) {
-  const data = useLiveQuery(
-    async () => {
-      const [challenge, cells] = await Promise.all([
-        challengeRepository.getChallenge(challengeId),
-        challengeRepository.listCells(challengeId),
-      ]);
-      return { challenge, cells };
-    },
-    [challengeId],
-  );
+  const data = useLiveQuery(async () => {
+    const [challenge, cells] = await Promise.all([
+      challengeRepository.getChallenge(challengeId),
+      challengeRepository.listCells(challengeId),
+    ]);
+    return { challenge, cells };
+  }, [challengeId]);
 
   const state: ChallengeState =
     data === undefined

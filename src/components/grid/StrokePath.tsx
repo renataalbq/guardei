@@ -5,6 +5,7 @@ interface StrokePathProps {
   stroke: StrokePoint[];
   /** Largura ÷ altura da célula, para o traço não deformar. */
   aspectRatio: number;
+  /** Anima o desenho da esquerda para a direita (risco por toque). */
   animate: boolean;
   /** Espessura em unidades do viewBox (100 = largura da célula). */
   strokeWidth: number;

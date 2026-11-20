@@ -23,7 +23,11 @@ beforeEach(() => {
   clock = new Date('2027-01-01T12:00:00.000Z');
   localChangeCount = 0;
   database = openGuardeiDatabase(`test-${crypto.randomUUID()}`);
-  repository = createChallengeRepository(database, () => clock, () => localChangeCount++);
+  repository = createChallengeRepository(
+    database,
+    () => clock,
+    () => localChangeCount++,
+  );
 });
 
 describe('challengeRepository', () => {
@@ -48,11 +52,29 @@ describe('challengeRepository', () => {
     clock = new Date('2027-01-02T09:00:00.000Z');
 
     await repository.markCellsAsSaved([
-      { cellId: first!.id, stroke: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] },
-      { cellId: second!.id, stroke: [{ x: 0, y: 0.4 }, { x: 0.8, y: 0.5 }] },
+      {
+        cellId: first!.id,
+        stroke: [
+          { x: 0, y: 0.5 },
+          { x: 1, y: 0.5 },
+        ],
+      },
+      {
+        cellId: second!.id,
+        stroke: [
+          { x: 0, y: 0.4 },
+          { x: 0.8, y: 0.5 },
+        ],
+      },
     ]);
     let cells = await repository.listCells(challenge.id);
-    expect(cells[0]).toMatchObject({ savedAt: '2027-01-02T09:00:00.000Z', stroke: [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }] });
+    expect(cells[0]).toMatchObject({
+      savedAt: '2027-01-02T09:00:00.000Z',
+      stroke: [
+        { x: 0, y: 0.5 },
+        { x: 1, y: 0.5 },
+      ],
+    });
     expect(cells[1]?.savedAt).toBeDefined();
 
     await repository.unmarkCell(first!.id);
@@ -64,9 +86,15 @@ describe('challengeRepository', () => {
   it('não sobrescreve uma célula que já estava riscada', async () => {
     const challenge = await repository.createChallenge(draft);
     const [first] = await repository.listCells(challenge.id);
-    await repository.markCellAsSaved(first!.id, [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]);
+    await repository.markCellAsSaved(first!.id, [
+      { x: 0, y: 0.5 },
+      { x: 1, y: 0.5 },
+    ]);
     clock = new Date('2027-02-01T00:00:00.000Z');
-    await repository.markCellAsSaved(first!.id, [{ x: 0, y: 0.1 }, { x: 1, y: 0.1 }]);
+    await repository.markCellAsSaved(first!.id, [
+      { x: 0, y: 0.1 },
+      { x: 1, y: 0.1 },
+    ]);
     const [after] = await repository.listCells(challenge.id);
     expect(after?.stroke?.[0]?.y).toBe(0.5);
   });
@@ -78,7 +106,10 @@ describe('challengeRepository', () => {
 
     await database.cells.toCollection().modify({ pendingSync: 0 });
     const [first] = await repository.listCells(challenge.id);
-    await repository.markCellAsSaved(first!.id, [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]);
+    await repository.markCellAsSaved(first!.id, [
+      { x: 0, y: 0.5 },
+      { x: 1, y: 0.5 },
+    ]);
     await repository.unmarkCell(first!.id);
     expect(await database.cells.where('pendingSync').equals(1).count()).toBe(1);
     expect(localChangeCount).toBe(3);

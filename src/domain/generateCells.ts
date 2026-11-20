@@ -73,7 +73,5 @@ export function generateWeeks52Values(goal: number): number[] {
 }
 
 export function generateCellValues(input: CellValuesInput): number[] {
-  return input.type === 'sequential'
-    ? generateSequentialValues(input.goal, input.step)
-    : generateWeeks52Values(input.goal);
+  return input.type === 'sequential' ? generateSequentialValues(input.goal, input.step) : generateWeeks52Values(input.goal);
 }

@@ -58,7 +58,7 @@ export function EmailCodeForm({ emailLabel, sendLabel, confirmLabel, requestCode
     });
   }
 
-  const buttonClassName = 'w-full rounded-xl bg-ink py-3 font-semibold text-white active:scale-[0.98] disabled:opacity-60';
+  const buttonClassName = 'btn-primary w-full py-3.5';
 
   if (step === 'email') {
     return (

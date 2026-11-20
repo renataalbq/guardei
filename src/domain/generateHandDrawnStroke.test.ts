@@ -17,7 +17,9 @@ describe('generateHandDrawnStroke', () => {
         expect(point.y).toBeGreaterThan(0.2);
         expect(point.y).toBeLessThan(0.8);
       }
-      expect(computeHorizontalCoverage(stroke, { left: 0, top: 0, width: 1, height: 1 })).toBeGreaterThanOrEqual(SCRATCH_COVERAGE_THRESHOLD);
+      expect(computeHorizontalCoverage(stroke, { left: 0, top: 0, width: 1, height: 1 })).toBeGreaterThanOrEqual(
+        SCRATCH_COVERAGE_THRESHOLD,
+      );
     }
   });
 });
