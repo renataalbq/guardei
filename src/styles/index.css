@@ -140,6 +140,27 @@ body {
   animation: saved-glow 500ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
 }
 
+/* Célula escolhida pelo "Sortear"/"Maior que cabe". */
+@keyframes spotlight {
+  0%,
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgb(255 61 127 / 0);
+  }
+  35%,
+  70% {
+    transform: scale(1.12);
+    box-shadow:
+      0 0 0 4px var(--accent),
+      0 12px 28px -6px rgb(255 61 127 / 0.6);
+  }
+}
+
+.cell-spotlight {
+  animation: spotlight 1.3s ease-in-out 2;
+  border-radius: 0.5rem;
+}
+
 /* Traço ao vivo some depois de soltar o dedo. */
 @keyframes live-stroke-fade {
   to {
@@ -202,6 +223,7 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .stroke-draw,
   .cell-saved-glow,
+  .cell-spotlight,
   .live-stroke-fade {
     animation: none;
   }

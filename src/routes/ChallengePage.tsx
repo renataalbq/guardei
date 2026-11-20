@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router';
 import { SavingsGrid } from '../components/grid/SavingsGrid';
+import { AffordableTodayButton } from '../components/today/AffordableTodayButton';
+import { AffordableTodaySheet } from '../components/today/AffordableTodaySheet';
+import { TodayBudgetBar } from '../components/today/TodayBudgetBar';
 import { ActivityStrip } from '../components/progress/ActivityStrip';
 import { ChallengeHero } from '../components/progress/ChallengeHero';
 import { MilestoneCelebration } from '../components/progress/MilestoneCelebration';
@@ -14,6 +17,7 @@ import { formatCurrency } from '../domain/formatCurrency';
 import { findMilestoneCrossed } from '../domain/milestones';
 import type { Cell } from '../domain/types';
 import { useChallenge } from '../hooks/useChallenge';
+import { useTodayBudget } from '../hooks/useTodayBudget';
 
 /** Vibração é só um extra: o Safari do iOS não tem `navigator.vibrate`. */
 function vibrateIfAvailable(pattern: number | number[]) {
@@ -41,13 +45,19 @@ function useMilestoneCelebration(goal: number | undefined, savedAmount: number |
   return { celebratingPercent, stopCelebrating };
 }
 
+const NO_CELLS: Cell[] = [];
+
 export function ChallengePage() {
   const { challengeId = '' } = useParams();
   const { state, markCellAsSavedByTap, markCellsAsSaved, unmarkCell } = useChallenge(challengeId);
   const [cellToUndo, setCellToUndo] = useState<Cell | undefined>();
+  const [isTodaySheetOpen, setIsTodaySheetOpen] = useState(false);
   const today = useMemo(() => todayCalendarDate(), []);
   const ready = state.status === 'ready' ? state : undefined;
   const { celebratingPercent, stopCelebrating } = useMilestoneCelebration(ready?.challenge.goal, ready?.progress.savedAmount);
+  const todayBudget = useTodayBudget(ready?.cells ?? NO_CELLS);
+  const openTodaySheet = useCallback(() => setIsTodaySheetOpen(true), []);
+  const closeTodaySheet = useCallback(() => setIsTodaySheetOpen(false), []);
 
   const handleSelectCell = useCallback(
     (cell: Cell) => {
@@ -89,10 +99,14 @@ export function ChallengePage() {
   return (
     <div className="min-h-dvh">
       <ProgressHeader name={challenge.name} progress={progress} />
-      <main className="mx-auto flex max-w-3xl flex-col gap-4 px-4 pt-4 pb-[max(2.5rem,env(safe-area-inset-bottom))]">
+      <main
+        className={`mx-auto flex max-w-3xl flex-col gap-4 px-4 pt-4 ${todayBudget.budget ? 'pb-28' : 'pb-[max(2.5rem,env(safe-area-inset-bottom))]'}`}
+      >
         <ChallengeHero progress={progress} />
         <ActivityStrip cells={cells} today={today} />
         <PaceCard challenge={challenge} savedAmount={progress.savedAmount} today={today} />
+
+        {!progress.isCompleted && <AffordableTodayButton activeAmount={todayBudget.budget?.amount} onClick={openTodaySheet} />}
 
         <div className="mt-2 flex items-end justify-between gap-2">
           <h2 className="font-display text-xl font-extrabold">Sua tabela</h2>
@@ -100,7 +114,14 @@ export function ChallengePage() {
             <Icon name="swipe" className="text-sm" /> Toque ou risque com o dedo
           </p>
         </div>
-        <SavingsGrid cells={cells} type={challenge.type} onSelectCell={handleSelectCell} onScratchCells={handleScratchCells} />
+        <SavingsGrid
+          cells={cells}
+          type={challenge.type}
+          onSelectCell={handleSelectCell}
+          onScratchCells={handleScratchCells}
+          affordableCellIds={todayBudget.affordableCellIds}
+          spotlightCellId={todayBudget.spotlightCellId}
+        />
         <p className="text-center text-xs text-muted">
           {progress.savedCount} de {progress.totalCount} valores riscados
         </p>
@@ -117,6 +138,19 @@ export function ChallengePage() {
           closeUndo();
         }}
       />
+
+      {isTodaySheetOpen && (
+        <AffordableTodaySheet
+          open
+          onClose={closeTodaySheet}
+          todayBudget={todayBudget}
+          smallestOpenValue={cells.reduce<number | undefined>(
+            (smallest, cell) => (cell.savedAt === undefined && (smallest === undefined || cell.value < smallest) ? cell.value : smallest),
+            undefined,
+          )}
+        />
+      )}
+      {!isTodaySheetOpen && <TodayBudgetBar todayBudget={todayBudget} onEdit={openTodaySheet} />}
 
       {celebratingPercent !== undefined && <MilestoneCelebration percent={celebratingPercent} onDone={stopCelebrating} />}
     </div>

@@ -4,7 +4,7 @@ import { computeGridColumns } from '../../domain/gridLayout';
 import { findScratchedCells, type CellRect, type Point } from '../../domain/strokeCoverage';
 import type { Cell, ChallengeType } from '../../domain/types';
 import { useScratchGesture } from '../../hooks/useScratchGesture';
-import { GridCell } from './GridCell';
+import { GridCell, type CellEmphasis } from './GridCell';
 
 const CELL_ASPECT_RATIO: Record<ChallengeType, number> = {
   sequential: 1,
@@ -23,6 +23,14 @@ interface SavingsGridProps {
   type: ChallengeType;
   onSelectCell: (cell: Cell) => void;
   onScratchCells: (marks: CellMark[]) => void;
+  /** Quando definido, destaca estas células (cabem no valor de hoje) e esmaece as outras não riscadas. */
+  affordableCellIds?: ReadonlySet<string>;
+  spotlightCellId?: string;
+}
+
+function emphasisOf(cell: Cell, affordableCellIds: ReadonlySet<string> | undefined): CellEmphasis {
+  if (!affordableCellIds || cell.savedAt !== undefined) return 'none';
+  return affordableCellIds.has(cell.id) ? 'affordable' : 'dimmed';
 }
 
 /** Mede a largura disponível para escolher quantas colunas cabem. */
@@ -61,7 +69,7 @@ function measureOpenCellRects(container: HTMLElement, openCellIds: ReadonlySet<s
   return rects;
 }
 
-export function SavingsGrid({ cells, type, onSelectCell, onScratchCells }: SavingsGridProps) {
+export function SavingsGrid({ cells, type, onSelectCell, onScratchCells, affordableCellIds, spotlightCellId }: SavingsGridProps) {
   const { ref: measureRef, width } = useContainerWidth<HTMLDivElement>();
   const gestureRef = useRef<HTMLDivElement>(null);
   const liveStrokeRef = useRef<SVGPathElement>(null);
@@ -110,6 +118,8 @@ export function SavingsGrid({ cells, type, onSelectCell, onScratchCells }: Savin
                 aspectRatio={CELL_ASPECT_RATIO[type]}
                 strokeWidth={STROKE_WIDTH[type]}
                 wasScratchedByFinger={scratchedByFinger.has(cell.id)}
+                emphasis={emphasisOf(cell, affordableCellIds)}
+                isSpotlight={cell.id === spotlightCellId}
                 onSelect={onSelectCell}
               />
             ))}
