@@ -1,6 +1,7 @@
 import { createId } from '../domain/createId';
 import { effectiveGoal, generateCellValues } from '../domain/generateCells';
 import type { ChallengeDraft } from '../domain/previewChallenge';
+import { DEFAULT_THEME } from '../domain/themes';
 import type { Cell, Challenge, StrokePoint, ThemeId } from '../domain/types';
 import { db as defaultDb, type CellRecord, type ChallengeRecord, type GuardeiDatabase } from './db';
 import { notifyLocalChange } from './localChanges';
@@ -24,7 +25,7 @@ export function createChallengeRepository(
   const timestamp = () => now().toISOString();
 
   return {
-    async createChallenge(draft: ChallengeDraft, theme: ThemeId = 'caderno'): Promise<Challenge> {
+    async createChallenge(draft: ChallengeDraft, theme: ThemeId = DEFAULT_THEME): Promise<Challenge> {
       const createdAt = timestamp();
       const challenge: ChallengeRecord = {
         id: createId(),

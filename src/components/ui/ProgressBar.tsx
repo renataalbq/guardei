@@ -8,7 +8,7 @@ interface ProgressBarProps {
 export function ProgressBar({ percent, label, tone = 'money', size = 'md' }: ProgressBarProps) {
   const clamped = Math.max(0, Math.min(100, percent));
   const track = tone === 'light' ? 'bg-white/25' : 'bg-ink-soft';
-  const fill = tone === 'light' ? 'bg-white' : 'bg-gradient-to-r from-money to-emerald-400';
+  const fill = tone === 'light' ? 'bg-white' : 'bg-money';
   return (
     <div
       role="progressbar"

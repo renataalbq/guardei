@@ -35,7 +35,7 @@ export function MonthlyLimitNotice({ plan, goal, monthlyLimit, endDate, onUseSug
 
   if (plan.fitsDeadline) {
     return (
-      <p className="flex items-start gap-2 rounded-2xl bg-money-soft p-4 text-sm font-medium text-emerald-900">
+      <p className="flex items-start gap-2 rounded-2xl bg-money-soft p-4 text-sm font-medium text-money-fg">
         <Icon name="check" className="mt-0.5 shrink-0 text-money" />
         <span>
           Cabe no seu limite: são ~{formatCurrency(plan.requiredPerMonth ?? 0)} por mês até {formatCalendarDate(endDate)}.

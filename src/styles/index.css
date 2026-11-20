@@ -20,6 +20,12 @@
   --color-ink-soft: var(--ink-soft);
   --color-accent: var(--accent);
   --color-accent-soft: var(--accent-soft);
+  --color-accent-fg: var(--accent-fg);
+  --color-on-ink: var(--on-ink);
+  --color-danger: var(--danger);
+  --color-inverse: var(--inverse);
+  --color-on-inverse: var(--on-inverse);
+  --color-money-fg: var(--money-fg);
   --color-money: var(--money);
   --color-money-soft: var(--money-soft);
   --color-marker: var(--marker);
@@ -30,27 +36,125 @@
   --color-warning-fg: var(--warning-fg);
 }
 
-:root {
+/*
+ * Temas: cada desafio escolhe um (data-theme no <html> enquanto ele está aberto).
+ * "marca-texto" é também o visual padrão do app (início, criar desafio, conta).
+ * Para criar um tema novo, copie um bloco e troque os valores; o teste themes.test.ts
+ * garante que nenhuma variável fique faltando.
+ */
+:root,
+[data-theme='marca-texto'] {
   --paper: #f5f3fc;
   --paper-line: #e6e1f6;
   --surface: #ffffff;
   --ink: #5b3df5;
+  --on-ink: #ffffff;
   --ink-strong: #2b1b8f;
   --ink-soft: #eeeaff;
   --accent: #ff3d7f;
   --accent-soft: #ffe4ee;
+  --accent-fg: #b0144d;
   --money: #10b981;
   --money-soft: #d9f7ec;
-  --marker: #ff3d7f;
+  --money-fg: #065f46;
+  --danger: #dc2626;
   --fg: #17142b;
   --muted: #6f6b86;
   --border: #e7e3f3;
   --warning-bg: #fff3d6;
   --warning-fg: #7a4b00;
+  --inverse: #17142b;
+  --on-inverse: #ffffff;
   --hero-gradient: linear-gradient(135deg, #4f34f0 0%, #8a3cf2 52%, #ff3d7f 100%);
   --shadow-card: 0 1px 2px rgb(23 20 43 / 0.04), 0 8px 24px -12px rgb(43 27 143 / 0.18);
   --shadow-brand: 0 10px 24px -10px rgb(91 61 245 / 0.65);
+  --page-pattern: none;
+  --cell-bg: var(--surface);
+  --cell-pattern: none;
+  --cell-number: var(--ink-strong);
+  --cell-saved-bg: color-mix(in srgb, var(--accent-soft) 60%, var(--surface));
+  --marker: #ff3d7f;
+  --marker-scale: 1;
+  --marker-opacity: 0.92;
+  --marker-glow: none;
   color-scheme: light;
+}
+
+/* Caderno: folha quadriculada creme e caneta esferográfica azul. */
+[data-theme='caderno'] {
+  --paper: #f7f4ea;
+  --paper-line: #c9dcf0;
+  --surface: #fffdf6;
+  --ink: #1d4ed8;
+  --on-ink: #ffffff;
+  --ink-strong: #1e3a8a;
+  --ink-soft: #e2eafb;
+  --accent: #dc2626;
+  --accent-soft: #fde4e1;
+  --accent-fg: #991b1b;
+  --money: #16a34a;
+  --money-soft: #dcf5e3;
+  --money-fg: #14532d;
+  --danger: #b91c1c;
+  --fg: #1c2333;
+  --muted: #64708a;
+  --border: #dfe3ea;
+  --warning-bg: #fff3cf;
+  --warning-fg: #7a4b00;
+  --inverse: #1e3a8a;
+  --on-inverse: #ffffff;
+  --hero-gradient: linear-gradient(135deg, #1e3a8a 0%, #1d4ed8 55%, #0ea5e9 100%);
+  --shadow-card: 0 1px 2px rgb(28 35 51 / 0.05), 0 8px 20px -12px rgb(30 58 138 / 0.25);
+  --shadow-brand: 0 10px 24px -10px rgb(29 78 216 / 0.6);
+  --page-pattern: linear-gradient(var(--paper-line) 1px, transparent 1px), linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  --cell-bg: #fffdf6;
+  --cell-pattern:
+    linear-gradient(rgb(201 220 240 / 0.55) 1px, transparent 1px), linear-gradient(90deg, rgb(201 220 240 / 0.55) 1px, transparent 1px);
+  --cell-number: #1e3a8a;
+  --cell-saved-bg: #fffdf6;
+  --marker: #1d4ed8;
+  --marker-scale: 0.55;
+  --marker-opacity: 0.95;
+  --marker-glow: none;
+  color-scheme: light;
+}
+
+/* Escuro: fundo noturno com risco neon. */
+[data-theme='escuro'] {
+  --paper: #0e0c18;
+  --paper-line: #2a2640;
+  --surface: #191628;
+  --ink: #a78bfa;
+  --on-ink: #120f1f;
+  --ink-strong: #ede9fe;
+  --ink-soft: #272140;
+  --accent: #ff5c9a;
+  --accent-soft: #3b1730;
+  --accent-fg: #ffb3cf;
+  --money: #34d399;
+  --money-soft: #0f2e25;
+  --money-fg: #86efc4;
+  --danger: #f87171;
+  --fg: #f4f2ff;
+  --muted: #a39fbd;
+  --border: #2d2942;
+  --warning-bg: #3a2906;
+  --warning-fg: #fcd34d;
+  --inverse: #f4f2ff;
+  --on-inverse: #17142b;
+  --hero-gradient: linear-gradient(135deg, #3b1d9e 0%, #7c3aed 50%, #db2777 100%);
+  --shadow-card: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 10px 28px -14px rgb(0 0 0 / 0.8);
+  --shadow-brand: 0 10px 28px -10px rgb(167 139 250 / 0.55);
+  --page-pattern: none;
+  --cell-bg: var(--surface);
+  --cell-pattern: none;
+  --cell-number: #ede9fe;
+  --cell-saved-bg: #24152a;
+  --marker: #ff5c9a;
+  --marker-scale: 0.9;
+  --marker-opacity: 1;
+  --marker-glow: drop-shadow(0 0 3px rgb(255 92 154 / 0.85));
+  color-scheme: dark;
 }
 
 html,
@@ -61,7 +165,11 @@ body,
 
 body {
   margin: 0;
-  background: var(--paper);
+  background-color: var(--paper);
+  background-image: var(--page-pattern);
+  background-size: 24px 24px;
+  background-attachment: fixed;
+  transition: background-color 250ms ease;
   color: var(--fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -92,7 +200,7 @@ body {
   gap: 0.5rem;
   border-radius: 1rem;
   background: var(--ink);
-  color: #fff;
+  color: var(--on-ink);
   font-weight: 700;
   box-shadow: var(--shadow-brand);
   transition: transform 120ms ease;
@@ -138,6 +246,19 @@ body {
 
 .cell-saved-glow {
   animation: saved-glow 500ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+/* Célula da grade: cor e textura vêm do tema. */
+@utility cell-paper {
+  background-color: var(--cell-bg);
+  background-image: var(--cell-pattern);
+  background-size: 25% 25%;
+}
+
+@utility cell-paper-saved {
+  background-color: var(--cell-saved-bg);
+  background-image: var(--cell-pattern);
+  background-size: 25% 25%;
 }
 
 /* Célula escolhida pelo "Sortear"/"Maior que cabe". */

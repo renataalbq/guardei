@@ -32,9 +32,9 @@ function useJustSaved(isSaved: boolean): boolean {
 export type CellEmphasis = 'none' | 'affordable' | 'dimmed';
 
 const EMPHASIS_CLASS: Record<CellEmphasis, string> = {
-  none: 'bg-surface',
+  none: 'cell-paper',
   affordable: 'bg-money-soft ring-2 ring-inset ring-money/60',
-  dimmed: 'bg-surface opacity-35',
+  dimmed: 'cell-paper opacity-35',
 };
 
 export const GridCell = memo(function GridCell({
@@ -60,7 +60,7 @@ export const GridCell = memo(function GridCell({
       onClick={() => onSelect(cell)}
       style={{ aspectRatio }}
       className={`relative flex flex-col items-center justify-center transition-[background-color,opacity] duration-300 select-none ${
-        isSaved ? 'bg-accent-soft/60' : EMPHASIS_CLASS[emphasis]
+        isSaved ? 'cell-paper-saved' : EMPHASIS_CLASS[emphasis]
       } ${justSaved ? 'cell-saved-glow' : ''} ${isSpotlight ? 'cell-spotlight z-10' : ''}`}
     >
       {type === 'weeks52' && (
@@ -70,7 +70,7 @@ export const GridCell = memo(function GridCell({
       )}
       <span
         className={`font-hand leading-none font-bold transition-colors ${type === 'weeks52' ? 'text-[1.7rem]' : 'text-[1.65rem]'} ${
-          isSaved ? 'text-muted/60' : emphasis === 'affordable' ? 'text-emerald-800' : 'text-ink-strong'
+          isSaved ? 'text-muted/60' : emphasis === 'affordable' ? 'text-money-fg' : 'text-[var(--cell-number)]'
         }`}
       >
         {formatCellNumber(cell.value)}

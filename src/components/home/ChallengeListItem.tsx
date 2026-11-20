@@ -51,7 +51,7 @@ export function ChallengeListItem({ summary, today }: { summary: ChallengeSummar
       </div>
       <p
         className={`mt-3 flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-semibold ${
-          next ? 'bg-accent-soft text-[#b0144d]' : 'bg-money-soft text-emerald-800'
+          next ? 'bg-accent-soft text-accent-fg' : 'bg-money-soft text-money-fg'
         }`}
       >
         <Icon name={next ? 'flag' : 'check'} className="shrink-0" />

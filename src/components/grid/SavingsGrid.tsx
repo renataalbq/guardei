@@ -124,7 +124,7 @@ export function SavingsGrid({ cells, type, onSelectCell, onScratchCells, afforda
               />
             ))}
             {Array.from({ length: emptySlotsInLastRow }, (_, index) => (
-              <div key={`empty-${index}`} aria-hidden="true" className="bg-surface" />
+              <div key={`empty-${index}`} aria-hidden="true" className="cell-paper" />
             ))}
           </div>
           <svg className="pointer-events-none absolute inset-0 h-full w-full overflow-visible" aria-hidden="true">
@@ -132,10 +132,13 @@ export function SavingsGrid({ cells, type, onSelectCell, onScratchCells, afforda
               ref={liveStrokeRef}
               fill="none"
               stroke="var(--marker)"
-              strokeWidth={LIVE_STROKE_WIDTH_PX}
               strokeLinecap="round"
               strokeLinejoin="round"
-              opacity={0.9}
+              style={{
+                strokeWidth: `calc(${LIVE_STROKE_WIDTH_PX}px * var(--marker-scale))`,
+                opacity: 'var(--marker-opacity)',
+                filter: 'var(--marker-glow)',
+              }}
             />
           </svg>
         </div>

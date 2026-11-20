@@ -1,5 +1,6 @@
 import { useMemo, useState, type FormEvent } from 'react';
 import { Link, useNavigate } from 'react-router';
+import { ThemePicker } from '../components/theme/ThemePicker';
 import { ChallengePreview } from '../components/create/ChallengePreview';
 import { ChallengeTypePicker } from '../components/create/ChallengeTypePicker';
 import { CurrencyInput } from '../components/create/CurrencyInput';
@@ -13,7 +14,8 @@ import { challengeRepository } from '../data/challengeRepository';
 import { todayCalendarDate } from '../domain/calendarDate';
 import { evaluateChallengeDraft, type ChallengeDraft } from '../domain/previewChallenge';
 import { suggestChallengeName } from '../domain/suggestChallengeName';
-import type { CalendarDate, ChallengeType, SequentialStep } from '../domain/types';
+import { DEFAULT_THEME } from '../domain/themes';
+import type { CalendarDate, ChallengeType, SequentialStep, ThemeId } from '../domain/types';
 
 const GOAL_SHORTCUTS = [5_000, 10_000, 20_000, 30_000, 50_000];
 
@@ -28,6 +30,7 @@ export function CreateChallengePage() {
   const [startDate, setStartDate] = useState<CalendarDate>(today);
   const [endDate, setEndDate] = useState<CalendarDate | undefined>();
   const [monthlyLimit, setMonthlyLimit] = useState<number | undefined>();
+  const [theme, setTheme] = useState<ThemeId>(DEFAULT_THEME);
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | undefined>();
@@ -51,7 +54,7 @@ export function CreateChallengePage() {
     setIsSaving(true);
     setSaveError(undefined);
     try {
-      const challenge = await challengeRepository.createChallenge(draft);
+      const challenge = await challengeRepository.createChallenge(draft, theme);
       navigate(`/desafio/${challenge.id}`, { replace: true });
     } catch (error) {
       console.error('Falha ao criar desafio', error);
@@ -138,6 +141,12 @@ export function CreateChallengePage() {
           </FormField>
         </section>
 
+        <section className="card p-5">
+          <FormField label="Estilo da tabela" hint="Dá para trocar depois, dentro do desafio.">
+            <ThemePicker value={theme} onChange={setTheme} />
+          </FormField>
+        </section>
+
         {evaluation.isValid ? (
           <ChallengePreview preview={evaluation.preview} type={type} step={step} endDate={endDate} />
         ) : (
@@ -153,7 +162,7 @@ export function CreateChallengePage() {
 
       <div className="fixed inset-x-0 bottom-0 border-t border-border/70 bg-paper/85 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl">
         {saveError && (
-          <p role="alert" className="mx-auto mb-2 max-w-xl text-center text-sm font-medium text-red-700">
+          <p role="alert" className="mx-auto mb-2 max-w-xl text-center text-sm font-medium text-danger">
             {saveError}
           </p>
         )}

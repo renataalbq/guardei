@@ -9,13 +9,16 @@ import { ChallengeHero } from '../components/progress/ChallengeHero';
 import { MilestoneCelebration } from '../components/progress/MilestoneCelebration';
 import { PaceCard } from '../components/progress/PaceCard';
 import { ProgressHeader } from '../components/progress/ProgressHeader';
+import { ThemePicker } from '../components/theme/ThemePicker';
+import { BottomSheet } from '../components/ui/BottomSheet';
 import { ConfirmDialog } from '../components/ui/ConfirmDialog';
 import { Icon } from '../components/ui/Icon';
-import type { CellMark } from '../data/challengeRepository';
+import { challengeRepository, type CellMark } from '../data/challengeRepository';
 import { todayCalendarDate } from '../domain/calendarDate';
 import { formatCurrency } from '../domain/formatCurrency';
 import { findMilestoneCrossed } from '../domain/milestones';
 import type { Cell } from '../domain/types';
+import { useApplyTheme } from '../hooks/useApplyTheme';
 import { useChallenge } from '../hooks/useChallenge';
 import { useTodayBudget } from '../hooks/useTodayBudget';
 
@@ -52,10 +55,12 @@ export function ChallengePage() {
   const { state, markCellAsSavedByTap, markCellsAsSaved, unmarkCell } = useChallenge(challengeId);
   const [cellToUndo, setCellToUndo] = useState<Cell | undefined>();
   const [isTodaySheetOpen, setIsTodaySheetOpen] = useState(false);
+  const [isThemeSheetOpen, setIsThemeSheetOpen] = useState(false);
   const today = useMemo(() => todayCalendarDate(), []);
   const ready = state.status === 'ready' ? state : undefined;
   const { celebratingPercent, stopCelebrating } = useMilestoneCelebration(ready?.challenge.goal, ready?.progress.savedAmount);
   const todayBudget = useTodayBudget(ready?.cells ?? NO_CELLS);
+  useApplyTheme(ready?.challenge.theme);
   const openTodaySheet = useCallback(() => setIsTodaySheetOpen(true), []);
   const closeTodaySheet = useCallback(() => setIsTodaySheetOpen(false), []);
 
@@ -108,11 +113,20 @@ export function ChallengePage() {
 
         {!progress.isCompleted && <AffordableTodayButton activeAmount={todayBudget.budget?.amount} onClick={openTodaySheet} />}
 
-        <div className="mt-2 flex items-end justify-between gap-2">
-          <h2 className="font-display text-xl font-extrabold">Sua tabela</h2>
-          <p className="flex items-center gap-1.5 text-xs font-semibold text-muted">
-            <Icon name="swipe" className="text-sm" /> Toque ou risque com o dedo
-          </p>
+        <div className="mt-2 flex items-center justify-between gap-2">
+          <div>
+            <h2 className="font-display text-xl font-extrabold">Sua tabela</h2>
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-muted">
+              <Icon name="swipe" className="text-sm" /> Toque ou risque com o dedo
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={() => setIsThemeSheetOpen(true)}
+            className="flex items-center gap-1.5 rounded-full bg-surface px-3.5 py-2 text-sm font-bold text-ink shadow-[var(--shadow-card)] active:scale-95"
+          >
+            <Icon name="palette" className="text-base" /> Tema
+          </button>
         </div>
         <SavingsGrid
           cells={cells}
@@ -150,6 +164,10 @@ export function ChallengePage() {
           )}
         />
       )}
+      <BottomSheet open={isThemeSheetOpen} title="Tema do desafio" onClose={() => setIsThemeSheetOpen(false)}>
+        <ThemePicker value={challenge.theme} onChange={(theme) => void challengeRepository.changeTheme(challenge.id, theme)} />
+        <p className="mt-4 text-center text-sm text-muted">O tema vale só para este desafio e aparece também na imagem de compartilhar.</p>
+      </BottomSheet>
       {!isTodaySheetOpen && <TodayBudgetBar todayBudget={todayBudget} onEdit={openTodaySheet} />}
 
       {celebratingPercent !== undefined && <MilestoneCelebration percent={celebratingPercent} onDone={stopCelebrating} />}

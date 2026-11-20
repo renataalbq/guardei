@@ -27,7 +27,11 @@ export function StrokePath({ stroke, aspectRatio, animate, strokeWidth }: Stroke
         pathLength={1}
         fill="none"
         stroke="var(--marker)"
-        strokeWidth={strokeWidth}
+        style={{
+          strokeWidth: `calc(${strokeWidth}px * var(--marker-scale))`,
+          opacity: 'var(--marker-opacity)',
+          filter: 'var(--marker-glow)',
+        }}
         strokeLinecap="round"
         strokeLinejoin="round"
         className={animate ? 'stroke-draw' : undefined}
