@@ -1,18 +1,27 @@
-@import '@fontsource/caveat/latin-500.css';
+@import '@fontsource-variable/bricolage-grotesque';
+@import '@fontsource-variable/plus-jakarta-sans';
+@import '@fontsource/caveat/latin-600.css';
 @import '@fontsource/caveat/latin-700.css';
 @import 'tailwindcss';
 
 @theme {
+  --font-sans: 'Plus Jakarta Sans Variable', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Bricolage Grotesque Variable', 'Plus Jakarta Sans Variable', system-ui, sans-serif;
   --font-hand: 'Caveat', 'Comic Sans MS', cursive;
 }
 
-/* Cores vêm de variáveis CSS para os temas poderem trocá-las (etapa de temas). */
+/* Cores vêm de variáveis CSS para os temas poderem trocá-las. */
 @theme inline {
   --color-paper: var(--paper);
   --color-paper-line: var(--paper-line);
   --color-surface: var(--surface);
   --color-ink: var(--ink);
+  --color-ink-strong: var(--ink-strong);
   --color-ink-soft: var(--ink-soft);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-money: var(--money);
+  --color-money-soft: var(--money-soft);
   --color-marker: var(--marker);
   --color-fg: var(--fg);
   --color-muted: var(--muted);
@@ -22,17 +31,25 @@
 }
 
 :root {
-  --paper: #fdfbf4;
-  --paper-line: #dde8f3;
+  --paper: #f5f3fc;
+  --paper-line: #e6e1f6;
   --surface: #ffffff;
-  --ink: #1f3a8a;
-  --ink-soft: #e6ecfa;
-  --marker: #1f3a8a;
-  --fg: #1f2937;
-  --muted: #6b7280;
-  --border: #d9dee7;
-  --warning-bg: #fff4d6;
+  --ink: #5b3df5;
+  --ink-strong: #2b1b8f;
+  --ink-soft: #eeeaff;
+  --accent: #ff3d7f;
+  --accent-soft: #ffe4ee;
+  --money: #10b981;
+  --money-soft: #d9f7ec;
+  --marker: #ff3d7f;
+  --fg: #17142b;
+  --muted: #6f6b86;
+  --border: #e7e3f3;
+  --warning-bg: #fff3d6;
   --warning-fg: #7a4b00;
+  --hero-gradient: linear-gradient(135deg, #4f34f0 0%, #8a3cf2 52%, #ff3d7f 100%);
+  --shadow-card: 0 1px 2px rgb(23 20 43 / 0.04), 0 8px 24px -12px rgb(43 27 143 / 0.18);
+  --shadow-brand: 0 10px 24px -10px rgb(91 61 245 / 0.65);
   color-scheme: light;
 }
 
@@ -46,17 +63,51 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--fg);
-  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior-y: none;
 }
 
+@utility font-numeric {
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+@utility card {
+  background: var(--surface);
+  border-radius: 1.5rem;
+  box-shadow: var(--shadow-card);
+}
+
+@utility hero-gradient {
+  background: var(--hero-gradient);
+  color: #fff;
+}
+
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: 1rem;
+  background: var(--ink);
+  color: #fff;
+  font-weight: 700;
+  box-shadow: var(--shadow-brand);
+  transition: transform 120ms ease;
+  &:active {
+    transform: scale(0.97);
+  }
+  &:disabled {
+    opacity: 0.6;
+  }
+}
+
 @utility paper-grid {
-  background-color: var(--paper);
-  background-image:
-    linear-gradient(var(--paper-line) 1px, transparent 1px),
-    linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
-  background-size: 24px 24px;
+  background-color: var(--surface);
+  background-image: linear-gradient(var(--paper-line) 1px, transparent 1px), linear-gradient(90deg, var(--paper-line) 1px, transparent 1px);
+  background-size: 22px 22px;
 }
 
 /* Risco desenhado da esquerda para a direita (pathLength=1). */
@@ -77,15 +128,27 @@ body {
 /* Brilho rápido na célula recém-riscada. */
 @keyframes saved-glow {
   0% {
-    background-color: color-mix(in srgb, var(--marker) 22%, var(--paper));
+    background-color: var(--accent-soft);
+    transform: scale(1.06);
   }
   100% {
-    background-color: var(--paper);
+    transform: scale(1);
   }
 }
 
 .cell-saved-glow {
-  animation: saved-glow 600ms ease-out;
+  animation: saved-glow 500ms cubic-bezier(0.2, 0.9, 0.3, 1.2);
+}
+
+/* Traço ao vivo some depois de soltar o dedo. */
+@keyframes live-stroke-fade {
+  to {
+    opacity: 0;
+  }
+}
+
+.live-stroke-fade {
+  animation: live-stroke-fade 260ms ease-out forwards;
 }
 
 @keyframes fade-in {
@@ -101,9 +164,45 @@ body {
   }
 }
 
+@keyframes pop-in {
+  0% {
+    transform: scale(0.6);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    transform: translate3d(0, -10vh, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate3d(var(--drift, 0px), 105vh, 0) rotate(var(--spin, 540deg));
+    opacity: 1;
+  }
+}
+
+@keyframes flame {
+  0%,
+  100% {
+    transform: scale(1) rotate(-3deg);
+  }
+  50% {
+    transform: scale(1.12) rotate(3deg);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .stroke-draw,
-  .cell-saved-glow {
+  .cell-saved-glow,
+  .live-stroke-fade {
     animation: none;
   }
 }

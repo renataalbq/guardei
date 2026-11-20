@@ -6,11 +6,8 @@ export function IosInstallHint() {
   if (!isVisible) return null;
 
   return (
-    <aside
-      aria-label="Instalar o Guardei"
-      className="relative rounded-2xl border border-border bg-surface p-4 pr-10 text-sm text-fg shadow-sm"
-    >
-      <p className="font-semibold">Instale o Guardei no seu iPhone</p>
+    <aside aria-label="Instalar o Guardei" className="card relative p-4 pr-10 text-sm text-fg">
+      <p className="font-display text-base font-bold">Instale o Guardei no seu iPhone</p>
       <p className="mt-1 text-muted">
         Toque em <Icon name="share" className="inline align-text-bottom text-base text-ink" /> <strong>Compartilhar</strong> na barra do
         Safari e depois em <strong>Adicionar à Tela de Início</strong>. Ele abre como app e funciona sem internet.

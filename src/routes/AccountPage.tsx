@@ -11,8 +11,8 @@ import { useSyncStatus } from '../hooks/useSyncStatus';
 
 function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="flex flex-col gap-3 rounded-2xl border border-border bg-surface p-4">
-      <h2 className="font-hand text-3xl font-bold text-ink">{title}</h2>
+    <section className="card flex flex-col gap-3 p-5">
+      <h2 className="font-display text-2xl font-extrabold">{title}</h2>
       {children}
     </section>
   );
@@ -96,7 +96,7 @@ function SignedInAccount({ service, email }: { service: AccountService; email: s
       <button
         type="button"
         onClick={() => setConfirmingSignOut(true)}
-        className="rounded-xl border border-border py-3 font-semibold text-fg active:scale-[0.98]"
+        className="rounded-2xl bg-ink-soft py-3.5 font-bold text-ink active:scale-[0.97]"
       >
         Sair deste aparelho
       </button>
@@ -119,23 +119,23 @@ export function AccountPage() {
   return (
     <main className="mx-auto min-h-dvh max-w-xl px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-10">
       <header className="flex items-center gap-2 py-2">
-        <Link to="/" aria-label="Voltar" className="-ml-2 rounded-full p-2 text-2xl text-ink active:bg-ink-soft">
+        <Link to="/" aria-label="Voltar" className="-ml-2 rounded-full p-2 text-2xl text-fg active:bg-ink-soft">
           <Icon name="back" />
         </Link>
-        <h1 className="font-hand text-4xl font-bold text-ink">Conta e nuvem</h1>
+        <h1 className="font-display text-3xl font-extrabold">Conta e nuvem</h1>
       </header>
 
       <div className="mt-4 flex flex-col gap-4">
         <SyncStatusLine status={syncStatus} />
-        {accountState.status === 'ready' && accountService && (
-          accountState.account === null ? (
+        {accountState.status === 'ready' &&
+          accountService &&
+          (accountState.account === null ? (
             <p className="text-sm text-muted">Assim que houver internet, sua conta é criada automaticamente.</p>
           ) : accountState.account.isAnonymous ? (
             <AnonymousAccount service={accountService} />
           ) : (
             <SignedInAccount service={accountService} email={accountState.account.email} />
-          )
-        )}
+          ))}
       </div>
     </main>
   );

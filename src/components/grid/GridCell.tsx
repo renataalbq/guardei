@@ -8,6 +8,8 @@ interface GridCellProps {
   type: ChallengeType;
   aspectRatio: number;
   strokeWidth: number;
+  /** Riscada agora com o dedo: o traço já foi visto ao vivo, então não redesenha animado. */
+  wasScratchedByFinger: boolean;
   onSelect: (cell: Cell) => void;
 }
 
@@ -23,7 +25,7 @@ function useJustSaved(isSaved: boolean): boolean {
   return justSaved;
 }
 
-export const GridCell = memo(function GridCell({ cell, type, aspectRatio, strokeWidth, onSelect }: GridCellProps) {
+export const GridCell = memo(function GridCell({ cell, type, aspectRatio, strokeWidth, wasScratchedByFinger, onSelect }: GridCellProps) {
   const isSaved = cell.savedAt !== undefined;
   const justSaved = useJustSaved(isSaved);
   const label = type === 'weeks52' ? `Semana ${cell.position + 1}, ${formatCurrency(cell.value)}` : formatCurrency(cell.value);
@@ -36,21 +38,25 @@ export const GridCell = memo(function GridCell({ cell, type, aspectRatio, stroke
       aria-pressed={isSaved}
       onClick={() => onSelect(cell)}
       style={{ aspectRatio }}
-      className={`relative flex flex-col items-center justify-center bg-paper select-none ${justSaved ? 'cell-saved-glow' : ''}`}
+      className={`relative flex flex-col items-center justify-center transition-colors select-none ${
+        isSaved ? 'bg-accent-soft/60' : 'bg-surface'
+      } ${justSaved ? 'cell-saved-glow' : ''}`}
     >
       {type === 'weeks52' && (
-        <span className={`text-[0.65rem] font-medium tracking-wide uppercase ${isSaved ? 'text-muted/60' : 'text-muted'}`}>
+        <span className={`text-[0.65rem] font-bold tracking-wide uppercase ${isSaved ? 'text-muted/60' : 'text-muted'}`}>
           Sem. {cell.position + 1}
         </span>
       )}
       <span
-        className={`font-hand leading-none font-bold transition-colors ${type === 'weeks52' ? 'text-2xl' : 'text-[1.6rem]'} ${
-          isSaved ? 'text-muted/70' : 'text-ink'
+        className={`font-hand leading-none font-bold transition-colors ${type === 'weeks52' ? 'text-[1.7rem]' : 'text-[1.65rem]'} ${
+          isSaved ? 'text-muted/60' : 'text-ink-strong'
         }`}
       >
         {formatCellNumber(cell.value)}
       </span>
-      {isSaved && cell.stroke && <StrokePath stroke={cell.stroke} aspectRatio={aspectRatio} strokeWidth={strokeWidth} animate={justSaved} />}
+      {isSaved && cell.stroke && (
+        <StrokePath stroke={cell.stroke} aspectRatio={aspectRatio} strokeWidth={strokeWidth} animate={justSaved && !wasScratchedByFinger} />
+      )}
     </button>
   );
 });

@@ -11,7 +11,15 @@ interface ConfirmDialogProps {
 }
 
 /** Confirmação em folha inferior, confortável para o polegar. */
-export function ConfirmDialog({ open, title, description, confirmLabel, cancelLabel = 'Cancelar', onConfirm, onCancel }: ConfirmDialogProps) {
+export function ConfirmDialog({
+  open,
+  title,
+  description,
+  confirmLabel,
+  cancelLabel = 'Cancelar',
+  onConfirm,
+  onCancel,
+}: ConfirmDialogProps) {
   const confirmRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
@@ -32,9 +40,9 @@ export function ConfirmDialog({ open, title, description, confirmLabel, cancelLa
         aria-modal="true"
         aria-labelledby="confirm-title"
         aria-describedby={description ? 'confirm-description' : undefined}
-        className="relative w-full max-w-md animate-[sheet-up_200ms_ease-out] rounded-t-3xl bg-surface p-5 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-xl sm:rounded-3xl"
+        className="relative w-full max-w-md animate-[sheet-up_200ms_ease-out] rounded-t-[2rem] bg-surface p-6 pb-[max(1.25rem,env(safe-area-inset-bottom))] shadow-xl sm:rounded-3xl"
       >
-        <h2 id="confirm-title" className="font-hand text-3xl font-bold text-ink">
+        <h2 id="confirm-title" className="font-display text-2xl font-bold text-fg">
           {title}
         </h2>
         {description && (
@@ -43,15 +51,10 @@ export function ConfirmDialog({ open, title, description, confirmLabel, cancelLa
           </p>
         )}
         <div className="mt-5 grid grid-cols-2 gap-2">
-          <button type="button" onClick={onCancel} className="rounded-xl border border-border py-3 font-semibold text-fg active:scale-[0.98]">
+          <button type="button" onClick={onCancel} className="rounded-2xl bg-ink-soft py-3.5 font-bold text-ink active:scale-[0.97]">
             {cancelLabel}
           </button>
-          <button
-            ref={confirmRef}
-            type="button"
-            onClick={onConfirm}
-            className="rounded-xl bg-ink py-3 font-semibold text-white active:scale-[0.98]"
-          >
+          <button ref={confirmRef} type="button" onClick={onConfirm} className="btn-primary py-3.5">
             {confirmLabel}
           </button>
         </div>

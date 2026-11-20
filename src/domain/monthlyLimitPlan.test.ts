@@ -21,7 +21,9 @@ describe('planForMonthlyLimit', () => {
   });
 
   it('limite exatamente igual ao necessário cabe', () => {
-    expect(planForMonthlyLimit({ goal: 12_000, startDate: '2027-01-01', endDate: '2027-12-31', monthlyLimit: 1_000 })?.fitsDeadline).toBe(true);
+    expect(planForMonthlyLimit({ goal: 12_000, startDate: '2027-01-01', endDate: '2027-12-31', monthlyLimit: 1_000 })?.fitsDeadline).toBe(
+      true,
+    );
   });
 
   it('sem prazo: só estima a data', () => {

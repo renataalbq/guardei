@@ -3,11 +3,7 @@ import { computeDeadlinePace, computeProgress } from './computeProgress';
 
 describe('computeProgress', () => {
   it('soma só as células riscadas', () => {
-    const progress = computeProgress(100, [
-      { value: 10, savedAt: 'x' },
-      { value: 40 },
-      { value: 50, savedAt: 'x' },
-    ]);
+    const progress = computeProgress(100, [{ value: 10, savedAt: 'x' }, { value: 40 }, { value: 50, savedAt: 'x' }]);
     expect(progress).toMatchObject({ savedAmount: 60, remainingAmount: 40, percent: 60, savedCount: 2, totalCount: 3, isCompleted: false });
   });
 
@@ -43,7 +39,7 @@ describe('computeDeadlinePace', () => {
 
   it('calcula quanto guardar por dia até o prazo (contando hoje)', () => {
     const pace = computeDeadlinePace({ ...base, savedAmount: 0, today: '2027-01-01' });
-    expect(pace).toMatchObject({ status: 'active', daysLeft: 365, dailyAmountNeeded: 55 });
+    expect(pace).toMatchObject({ status: 'active', daysLeft: 365, dailyAmountNeeded: 55, weeklyAmountNeeded: 384 });
     expect(pace.status === 'active' && pace.projectedFinishDate).toBeFalsy();
   });
 
@@ -56,6 +52,11 @@ describe('computeDeadlinePace', () => {
   it('indica quando o ritmo atual não chega no prazo', () => {
     const pace = computeDeadlinePace({ ...base, savedAmount: 100, today: '2027-01-10' });
     expect(pace).toMatchObject({ status: 'active', onTrack: false });
+  });
+
+  it('na última semana, o valor semanal é o que falta', () => {
+    const pace = computeDeadlinePace({ ...base, savedAmount: 19_000, today: '2027-12-29' });
+    expect(pace).toMatchObject({ dailyAmountNeeded: 334, weeklyAmountNeeded: 1_000 });
   });
 
   it('não projeta com menos de 7 dias de desafio', () => {
@@ -72,6 +73,7 @@ describe('computeDeadlinePace', () => {
       remainingAmount: 500,
       daysLeft: undefined,
       dailyAmountNeeded: undefined,
+      weeklyAmountNeeded: undefined,
       projectedFinishDate: '2027-01-20',
       onTrack: undefined,
     });

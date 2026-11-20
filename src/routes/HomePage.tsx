@@ -1,52 +1,41 @@
-import { useMemo } from "react";
-import { Link } from "react-router";
-import { CloudStatusButton } from "../components/account/CloudStatusButton";
-import { ProtectAccountBanner } from "../components/account/ProtectAccountBanner";
-import { ChallengeListItem } from "../components/home/ChallengeListItem";
-import { Icon } from "../components/ui/Icon";
-import { IosInstallHint } from "../components/ui/IosInstallHint";
-import { todayCalendarDate } from "../domain/calendarDate";
-import { useChallengeSummaries } from "../hooks/useChallengeSummaries";
-
-function EmptyState() {
-  return (
-    <section className="paper-grid flex flex-col items-center gap-4 rounded-3xl border border-border px-6 py-10 text-center">
-      <p className="font-hand text-4xl leading-tight font-bold text-ink">
-        Risque um número
-        <br />
-        cada vez que guardar
-      </p>
-      <p className="max-w-xs text-sm text-fg">
-        Escolha uma meta e o Guardei monta a sua tabela. Guardou R$ 37 hoje?
-        Risca o 37. Quando todos estiverem riscados, a meta está batida.
-      </p>
-      <Link
-        to="/novo"
-        className="rounded-xl bg-ink px-6 py-3.5 font-semibold text-white active:scale-[0.98]"
-      >
-        Criar meu desafio
-      </Link>
-    </section>
-  );
-}
+import { useMemo } from 'react';
+import { Link } from 'react-router';
+import { CloudStatusButton } from '../components/account/CloudStatusButton';
+import { ProtectAccountBanner } from '../components/account/ProtectAccountBanner';
+import { ChallengeListItem } from '../components/home/ChallengeListItem';
+import { EmptyState } from '../components/home/EmptyState';
+import { Icon } from '../components/ui/Icon';
+import { IosInstallHint } from '../components/ui/IosInstallHint';
+import { Logo } from '../components/ui/Logo';
+import { todayCalendarDate } from '../domain/calendarDate';
+import { formatCurrency } from '../domain/formatCurrency';
+import { useChallengeSummaries } from '../hooks/useChallengeSummaries';
 
 export function HomePage() {
   const summaries = useChallengeSummaries();
   const today = useMemo(() => todayCalendarDate(), []);
+  const totalSaved = summaries?.reduce((sum, summary) => sum + summary.progress.savedAmount, 0) ?? 0;
+  const hasChallenges = summaries !== undefined && summaries.length > 0;
 
   return (
     <main className="mx-auto min-h-dvh max-w-xl px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-28">
-      <header className="flex items-center justify-between py-2">
-        <h1 className="font-hand text-5xl font-bold text-ink">Guardei</h1>
+      <header className="flex items-center justify-between py-3">
+        <Logo />
         <CloudStatusButton />
       </header>
 
-      <div className="mt-4 flex flex-col gap-4">
+      <div className="mt-3 flex flex-col gap-4">
         <IosInstallHint />
-        {summaries === undefined ? null : summaries.length === 0 ? (
+        {summaries === undefined ? null : !hasChallenges ? (
           <EmptyState />
         ) : (
           <>
+            <div>
+              <p className="text-sm font-semibold text-muted">
+                {summaries.length > 1 ? 'Guardado em todos os desafios' : 'Você já guardou'}
+              </p>
+              <p className="font-display text-[2.75rem] leading-none font-extrabold text-fg font-numeric">{formatCurrency(totalSaved)}</p>
+            </div>
             <ProtectAccountBanner />
             <ul className="flex flex-col gap-3">
               {summaries.map((summary) => (
@@ -59,11 +48,8 @@ export function HomePage() {
         )}
       </div>
 
-      {summaries && summaries.length > 0 && (
-        <Link
-          to="/novo"
-          className="fixed right-4 bottom-[max(1.25rem,env(safe-area-inset-bottom))] flex items-center gap-2 rounded-full bg-ink px-5 py-3.5 font-semibold text-white shadow-lg active:scale-95"
-        >
+      {hasChallenges && (
+        <Link to="/novo" className="btn-primary fixed right-4 bottom-[max(1.25rem,env(safe-area-inset-bottom))] rounded-full px-5 py-4">
           <Icon name="plus" className="text-xl" /> Novo desafio
         </Link>
       )}

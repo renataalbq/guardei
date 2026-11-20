@@ -31,7 +31,11 @@ export function createLocalSyncStore(db: GuardeiDatabase) {
     async markChallengesSynced(sent: readonly ChallengeRecord[]): Promise<void> {
       await db.transaction('rw', db.challenges, async () => {
         for (const { id, updatedAt } of sent) {
-          await db.challenges.where('id').equals(id).and((row) => row.updatedAt === updatedAt).modify({ pendingSync: 0 });
+          await db.challenges
+            .where('id')
+            .equals(id)
+            .and((row) => row.updatedAt === updatedAt)
+            .modify({ pendingSync: 0 });
         }
       });
     },
@@ -39,7 +43,11 @@ export function createLocalSyncStore(db: GuardeiDatabase) {
     async markCellsSynced(sent: readonly CellRecord[]): Promise<void> {
       await db.transaction('rw', db.cells, async () => {
         for (const { id, updatedAt } of sent) {
-          await db.cells.where('id').equals(id).and((row) => row.updatedAt === updatedAt).modify({ pendingSync: 0 });
+          await db.cells
+            .where('id')
+            .equals(id)
+            .and((row) => row.updatedAt === updatedAt)
+            .modify({ pendingSync: 0 });
         }
       });
     },
@@ -83,7 +91,9 @@ export function createLocalSyncStore(db: GuardeiDatabase) {
           const newChallengeId = createId();
           await db.challenges.add({ ...challenge, id: newChallengeId, pendingSync: 1 });
           const ownCells = cells.filter((cell) => cell.challengeId === challenge.id);
-          await db.cells.bulkAdd(ownCells.map((cell) => ({ ...cell, id: createId(), challengeId: newChallengeId, pendingSync: 1 as const })));
+          await db.cells.bulkAdd(
+            ownCells.map((cell) => ({ ...cell, id: createId(), challengeId: newChallengeId, pendingSync: 1 as const })),
+          );
         }
       });
     },

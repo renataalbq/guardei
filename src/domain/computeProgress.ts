@@ -54,6 +54,8 @@ export type DeadlinePace =
       daysLeft?: number;
       /** Quanto guardar por dia (arredondado para cima) para chegar ao prazo. */
       dailyAmountNeeded?: number;
+      /** O mesmo, por semana: um número mais fácil de planejar. */
+      weeklyAmountNeeded?: number;
       /** Data estimada de conclusão mantendo o ritmo atual; ausente se nada foi guardado ou se o desafio tem menos de 7 dias. */
       projectedFinishDate?: CalendarDate;
       /** Se o ritmo atual chega até o prazo. */
@@ -72,6 +74,7 @@ export function computeDeadlinePace({ goal, savedAmount, startDate, endDate, tod
 
   const daysLeft = endDate ? daysInPeriodInclusive(today, endDate) : undefined;
   const dailyAmountNeeded = daysLeft ? Math.ceil(remainingAmount / daysLeft) : undefined;
+  const weeklyAmountNeeded = daysLeft ? Math.ceil(remainingAmount / Math.max(1, daysLeft / 7)) : undefined;
 
   let projectedFinishDate: CalendarDate | undefined;
   const daysElapsed = daysInPeriodInclusive(startDate, today);
@@ -82,5 +85,5 @@ export function computeDeadlinePace({ goal, savedAmount, startDate, endDate, tod
 
   const onTrack = endDate && projectedFinishDate ? projectedFinishDate <= endDate : undefined;
 
-  return { status: 'active', remainingAmount, daysLeft, dailyAmountNeeded, projectedFinishDate, onTrack };
+  return { status: 'active', remainingAmount, daysLeft, dailyAmountNeeded, weeklyAmountNeeded, projectedFinishDate, onTrack };
 }

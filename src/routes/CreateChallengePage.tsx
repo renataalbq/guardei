@@ -32,7 +32,15 @@ export function CreateChallengePage() {
   const [isSaving, setIsSaving] = useState(false);
   const [saveError, setSaveError] = useState<string | undefined>();
 
-  const draft: ChallengeDraft = { name, goal: goal ?? 0, type, step, startDate, endDate, monthlyLimit };
+  const draft: ChallengeDraft = {
+    name,
+    goal: goal ?? 0,
+    type,
+    step,
+    startDate,
+    endDate,
+    monthlyLimit,
+  };
   const evaluation = evaluateChallengeDraft(draft);
   const showProblems = submitAttempted || goal !== undefined;
 
@@ -56,49 +64,53 @@ export function CreateChallengePage() {
   return (
     <main className="mx-auto min-h-dvh max-w-xl px-4 pt-[max(1rem,env(safe-area-inset-top))] pb-32">
       <header className="flex items-center gap-2 py-2">
-        <Link to="/" aria-label="Voltar" className="-ml-2 rounded-full p-2 text-2xl text-ink active:bg-ink-soft">
+        <Link to="/" aria-label="Voltar" className="-ml-2 rounded-full p-2 text-2xl text-fg active:bg-ink-soft">
           <Icon name="back" />
         </Link>
-        <h1 className="font-hand text-4xl font-bold text-ink">Novo desafio</h1>
+        <h1 className="font-display text-3xl font-extrabold">Novo desafio</h1>
       </header>
 
-      <form id="create-challenge" onSubmit={handleSubmit} noValidate className="mt-4 flex flex-col gap-6">
-        <FormField label="Quanto você quer juntar?" htmlFor="goal">
-          <CurrencyInput id="goal" value={goal} onChange={setGoal} placeholder="20.000" />
-          <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
-            {GOAL_SHORTCUTS.map((shortcut) => (
-              <ChoiceChip key={shortcut} selected={goal === shortcut} onSelect={() => setGoal(shortcut)}>
-                {shortcut / 1_000} mil
-              </ChoiceChip>
-            ))}
-          </div>
-        </FormField>
-
-        <FormField label="Tipo de desafio">
-          <ChallengeTypePicker value={type} onChange={setType} />
-        </FormField>
-
-        {type === 'sequential' && (
-          <FormField label="Valores das células" hint="Valores maiores = menos células para riscar.">
-            <StepPicker value={step} onChange={setStep} />
+      <form id="create-challenge" onSubmit={handleSubmit} noValidate className="mt-4 flex flex-col gap-4">
+        <section className="card flex flex-col gap-5 p-5">
+          <FormField label="Quanto você quer juntar?" htmlFor="goal">
+            <CurrencyInput id="goal" value={goal} onChange={setGoal} placeholder="20.000" />
+            <div className="-mx-1 flex gap-2 overflow-x-auto px-1 pb-1">
+              {GOAL_SHORTCUTS.map((shortcut) => (
+                <ChoiceChip key={shortcut} selected={goal === shortcut} onSelect={() => setGoal(shortcut)}>
+                  {shortcut / 1_000} mil
+                </ChoiceChip>
+              ))}
+            </div>
           </FormField>
-        )}
 
-        <DeadlineFields
-          today={today}
-          startDate={startDate}
-          endDate={endDate}
-          onStartDateChange={setStartDate}
-          onEndDateChange={setEndDate}
-        />
+          <FormField label="Tipo de desafio">
+            <ChallengeTypePicker value={type} onChange={setType} />
+          </FormField>
 
-        <FormField
-          label="Quanto você consegue guardar por mês, no máximo? (opcional)"
-          htmlFor="monthly-limit"
-          hint="Assim o app avisa se o prazo está apertado."
-        >
-          <CurrencyInput id="monthly-limit" value={monthlyLimit} onChange={setMonthlyLimit} placeholder="1.400" />
-        </FormField>
+          {type === 'sequential' && (
+            <FormField label="Valores das células" hint="Valores maiores = menos células para riscar.">
+              <StepPicker value={step} onChange={setStep} />
+            </FormField>
+          )}
+        </section>
+
+        <section className="card flex flex-col gap-5 p-5">
+          <DeadlineFields
+            today={today}
+            startDate={startDate}
+            endDate={endDate}
+            onStartDateChange={setStartDate}
+            onEndDateChange={setEndDate}
+          />
+
+          <FormField
+            label="Quanto você consegue guardar por mês, no máximo? (opcional)"
+            htmlFor="monthly-limit"
+            hint="Assim o app avisa se o prazo está apertado."
+          >
+            <CurrencyInput id="monthly-limit" value={monthlyLimit} onChange={setMonthlyLimit} placeholder="1.400" />
+          </FormField>
+        </section>
 
         {evaluation.isValid && monthlyLimit && evaluation.preview.monthlyLimitPlan && (
           <MonthlyLimitNotice
@@ -110,25 +122,27 @@ export function CreateChallengePage() {
           />
         )}
 
-        <FormField label="Nome do desafio" htmlFor="name" error={submitAttempted ? evaluation.nameProblem : undefined}>
-          <input
-            id="name"
-            type="text"
-            value={name}
-            maxLength={60}
-            autoComplete="off"
-            enterKeyHint="done"
-            placeholder={`Ex.: ${suggestChallengeName(goal ?? 20_000, endDate)}`}
-            onChange={(event) => setName(event.target.value)}
-            className={textInputClassName}
-          />
-        </FormField>
+        <section className="card p-5">
+          <FormField label="Nome do desafio" htmlFor="name" error={submitAttempted ? evaluation.nameProblem : undefined}>
+            <input
+              id="name"
+              type="text"
+              value={name}
+              maxLength={60}
+              autoComplete="off"
+              enterKeyHint="done"
+              placeholder={`Ex.: ${suggestChallengeName(goal ?? 20_000, endDate)}`}
+              onChange={(event) => setName(event.target.value)}
+              className={textInputClassName}
+            />
+          </FormField>
+        </section>
 
         {evaluation.isValid ? (
           <ChallengePreview preview={evaluation.preview} type={type} step={step} endDate={endDate} />
         ) : (
           showProblems && (
-            <ul className="flex flex-col gap-1 rounded-xl bg-warning-bg p-3 text-sm text-warning-fg">
+            <ul className="flex flex-col gap-1 rounded-2xl bg-warning-bg p-4 text-sm font-medium text-warning-fg">
               {evaluation.problems.map((problem) => (
                 <li key={problem}>{problem}</li>
               ))}
@@ -137,7 +151,7 @@ export function CreateChallengePage() {
         )}
       </form>
 
-      <div className="fixed inset-x-0 bottom-0 border-t border-border bg-paper/95 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur">
+      <div className="fixed inset-x-0 bottom-0 border-t border-border/70 bg-paper/85 px-4 pt-3 pb-[max(0.75rem,env(safe-area-inset-bottom))] backdrop-blur-xl">
         {saveError && (
           <p role="alert" className="mx-auto mb-2 max-w-xl text-center text-sm font-medium text-red-700">
             {saveError}
@@ -147,7 +161,7 @@ export function CreateChallengePage() {
           type="submit"
           form="create-challenge"
           disabled={isSaving}
-          className="mx-auto block w-full max-w-xl rounded-xl bg-ink py-3.5 text-base font-semibold text-white active:scale-[0.98] disabled:opacity-60"
+          className="btn-primary mx-auto flex w-full max-w-xl py-4 font-display text-lg"
         >
           {isSaving ? 'Criando…' : 'Criar desafio'}
         </button>

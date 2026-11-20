@@ -56,7 +56,11 @@ function createDevice(server: ReturnType<typeof createFakeServer>, userId: strin
   const account = { userId };
   const database: GuardeiDatabase = openGuardeiDatabase(`device-${crypto.randomUUID()}`);
   const clock = { now: new Date('2027-01-01T12:00:00.000Z') };
-  const repository = createChallengeRepository(database, () => clock.now, () => {});
+  const repository = createChallengeRepository(
+    database,
+    () => clock.now,
+    () => {},
+  );
   const engine = createSyncEngine(createLocalSyncStore(database), server.remoteFor(account));
   return { account, database, clock, repository, sync: () => engine.sync() };
 }
@@ -74,7 +78,10 @@ describe('sincronização', () => {
     const phone = createDevice(server, 'ana');
     const challenge = await phone.repository.createChallenge(draft);
     const [first] = await phone.repository.listCells(challenge.id);
-    await phone.repository.markCellAsSaved(first!.id, [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]);
+    await phone.repository.markCellAsSaved(first!.id, [
+      { x: 0, y: 0.5 },
+      { x: 1, y: 0.5 },
+    ]);
 
     await phone.sync();
 
@@ -89,7 +96,10 @@ describe('sincronização', () => {
     const phone = createDevice(server, 'ana');
     const challenge = await phone.repository.createChallenge(draft);
     const cells = await phone.repository.listCells(challenge.id);
-    await phone.repository.markCellAsSaved(cells[36]!.id, [{ x: 0.1, y: 0.4 }, { x: 0.9, y: 0.6 }]);
+    await phone.repository.markCellAsSaved(cells[36]!.id, [
+      { x: 0.1, y: 0.4 },
+      { x: 0.9, y: 0.6 },
+    ]);
     await phone.sync();
 
     const tablet = createDevice(server, 'ana');
@@ -98,7 +108,13 @@ describe('sincronização', () => {
     expect((await tablet.repository.listChallenges()).map((c) => c.name)).toEqual(['20 mil']);
     const tabletCells = await tablet.repository.listCells(challenge.id);
     expect(tabletCells).toHaveLength(199);
-    expect(tabletCells[36]).toMatchObject({ value: 37, stroke: [{ x: 0.1, y: 0.4 }, { x: 0.9, y: 0.6 }] });
+    expect(tabletCells[36]).toMatchObject({
+      value: 37,
+      stroke: [
+        { x: 0.1, y: 0.4 },
+        { x: 0.9, y: 0.6 },
+      ],
+    });
   });
 
   it('não mistura contas diferentes', async () => {
@@ -121,10 +137,16 @@ describe('sincronização', () => {
 
     // celular (offline) risca às 10h
     phone.clock.now = new Date('2027-02-01T10:00:00.000Z');
-    await phone.repository.markCellAsSaved(cell!.id, [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]);
+    await phone.repository.markCellAsSaved(cell!.id, [
+      { x: 0, y: 0.5 },
+      { x: 1, y: 0.5 },
+    ]);
     // tablet risca e desfaz às 11h, e sincroniza primeiro
     tablet.clock.now = new Date('2027-02-01T11:00:00.000Z');
-    await tablet.repository.markCellAsSaved(cell!.id, [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]);
+    await tablet.repository.markCellAsSaved(cell!.id, [
+      { x: 0, y: 0.5 },
+      { x: 1, y: 0.5 },
+    ]);
     await tablet.repository.unmarkCell(cell!.id);
     await tablet.sync();
 
@@ -144,16 +166,28 @@ describe('sincronização', () => {
     const [cell] = await phone.repository.listCells(challenge.id);
 
     tablet.clock.now = new Date('2027-02-01T10:00:00.000Z');
-    await tablet.repository.markCellAsSaved(cell!.id, [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]);
+    await tablet.repository.markCellAsSaved(cell!.id, [
+      { x: 0, y: 0.5 },
+      { x: 1, y: 0.5 },
+    ]);
     await tablet.sync();
 
     phone.clock.now = new Date('2027-02-01T12:00:00.000Z');
-    await phone.repository.markCellAsSaved(cell!.id, [{ x: 0, y: 0.3 }, { x: 1, y: 0.3 }]);
+    await phone.repository.markCellAsSaved(cell!.id, [
+      { x: 0, y: 0.3 },
+      { x: 1, y: 0.3 },
+    ]);
     await phone.sync();
     await tablet.sync();
 
-    expect(server.cells.get(cell!.id)?.stroke).toEqual([{ x: 0, y: 0.3 }, { x: 1, y: 0.3 }]);
-    expect((await tablet.repository.listCells(challenge.id))[0]?.stroke).toEqual([{ x: 0, y: 0.3 }, { x: 1, y: 0.3 }]);
+    expect(server.cells.get(cell!.id)?.stroke).toEqual([
+      { x: 0, y: 0.3 },
+      { x: 1, y: 0.3 },
+    ]);
+    expect((await tablet.repository.listCells(challenge.id))[0]?.stroke).toEqual([
+      { x: 0, y: 0.3 },
+      { x: 1, y: 0.3 },
+    ]);
   });
 
   it('apagar um desafio chega aos outros aparelhos', async () => {
@@ -213,7 +247,10 @@ describe('localSyncStore.markCellsSynced', () => {
 
     phone.clock.now = new Date('2027-01-05T00:00:00.000Z');
     const [first] = await phone.repository.listCells(challenge.id);
-    await phone.repository.markCellAsSaved(first!.id, [{ x: 0, y: 0.5 }, { x: 1, y: 0.5 }]);
+    await phone.repository.markCellAsSaved(first!.id, [
+      { x: 0, y: 0.5 },
+      { x: 1, y: 0.5 },
+    ]);
 
     await store.markCellsSynced(sent);
     expect(await store.listPendingCells()).toHaveLength(1);
