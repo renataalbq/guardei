@@ -58,14 +58,21 @@ describe('computeDeadlinePace', () => {
     expect(pace).toMatchObject({ status: 'active', onTrack: false });
   });
 
+  it('não projeta com menos de 7 dias de desafio', () => {
+    const pace = computeDeadlinePace({ ...base, savedAmount: 257, today: '2027-01-06' });
+    expect(pace.status === 'active' && pace.projectedFinishDate).toBeUndefined();
+    const paceOnDay7 = computeDeadlinePace({ ...base, savedAmount: 257, today: '2027-01-07' });
+    expect(paceOnDay7.status === 'active' && paceOnDay7.projectedFinishDate).toBeDefined();
+  });
+
   it('sem prazo: só projeção', () => {
-    const pace = computeDeadlinePace({ goal: 1_000, savedAmount: 500, startDate: '2027-01-01', today: '2027-01-05' });
+    const pace = computeDeadlinePace({ goal: 1_000, savedAmount: 500, startDate: '2027-01-01', today: '2027-01-10' });
     expect(pace).toEqual({
       status: 'active',
       remainingAmount: 500,
       daysLeft: undefined,
       dailyAmountNeeded: undefined,
-      projectedFinishDate: '2027-01-10',
+      projectedFinishDate: '2027-01-20',
       onTrack: undefined,
     });
   });

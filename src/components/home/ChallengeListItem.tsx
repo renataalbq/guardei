@@ -36,7 +36,7 @@ export function ChallengeListItem({ summary, today }: { summary: ChallengeSummar
       className="block rounded-2xl border border-border bg-surface p-4 shadow-sm transition-transform active:scale-[0.99]"
     >
       <div className="flex items-baseline justify-between gap-3">
-        <h2 className="truncate font-hand text-3xl font-bold text-ink">{challenge.name}</h2>
+        <h2 className="truncate pr-2 font-hand text-3xl font-bold text-ink">{challenge.name}</h2>
         <span className="shrink-0 text-sm font-semibold text-fg">{Math.floor(progress.percent)}%</span>
       </div>
       <p className="mt-1 text-sm text-fg">
