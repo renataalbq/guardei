@@ -1,10 +1,13 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { App } from './App';
+import { startBackgroundSync } from './data/sync/cloudSync';
 import './styles/index.css';
 
 const rootElement = document.getElementById('root');
 if (!rootElement) throw new Error('Elemento #root não encontrado.');
+
+startBackgroundSync();
 
 createRoot(rootElement).render(
   <StrictMode>
